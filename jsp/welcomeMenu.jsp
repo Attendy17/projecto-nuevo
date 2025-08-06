@@ -147,7 +147,6 @@
         <a href="profile.jsp">Profile</a>
         <a href="searchFriends.jsp">Search Friends</a>
         <a href="friendList.jsp">Friend List</a>
-        <a href="friendRequests.jsp">Friend Requests</a>
         <a href="signout.jsp">Sign Out</a>
       </div>
     </div>
@@ -178,3 +177,4 @@
 
   </body>
 </html>
+
