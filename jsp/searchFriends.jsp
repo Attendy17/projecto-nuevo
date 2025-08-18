@@ -271,9 +271,10 @@
       <td>
         <img src="<%= request.getContextPath() %>/<%= profilePic %>" alt="Profile Picture" width="50" height="50" />
       </td>
-      <td class="action-link">
-        <a href="addFriend.jsp?friendId=<%= rs.getLong("id") %>">Add Friend</a>
+      <td class="photo">
+            <img src="<%= request.getContextPath() %>/images/<%= profilePic %>" width="50" height="50" alt="Profile Picture"/>
       </td>
+
     </tr>
 <%
       }
@@ -290,3 +291,4 @@
 
 </body>
 </html>
+
