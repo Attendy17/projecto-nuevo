@@ -1,294 +1,232 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="ut.JAR.CPEN410.FriendDAO" %>
-<%@ page import="ut.JAR.CPEN410.MySQLCompleteConnector" %>
-<%@ page import="java.sql.*" %>
-
-<html>
+<%@ page import="ut.JAR.CPEN410.SearchFriend" %>
+<%@ page import="ut.JAR.CPEN410.applicationDBAuthenticationGoodComplete" %>
+<%@ page import="java.sql.ResultSet" %>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Search Friends - minifacebook</title>
-  
-  <!-- Prevent browser from caching this page -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+  <meta charset="UTF-8" />
+  <title>Search Friends - MiniFacebook</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
 
   <style>
-    /* Base reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    /* Base del login (sin padding) */
+    * { box-sizing: border-box; margin: 0; }
+    html { font-family: "Lucida Sans", sans-serif; }
+    body { background-color: #ffffff; margin: 0; }
 
-    body {
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      background-color: #f8f9fa;
-    }
-
-    /* Header bar */
-    .taskbar {
-      background-color: #6F4E37;
-      color: #fff;
-      padding: 10px 20px;
-      text-align: center;
-    }
-
-    /* Navigation bar */
-    .nav-bar {
-      background-color: #6F4E37;
-      padding: 10px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .nav-left {
-      color: #fff;
-      font-weight: bold;
-    }
-
-    .nav-right {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .nav-right a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 6px 10px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
-
-    .nav-right a:hover {
-      background-color: #8c6d54;
-    }
-
-    /* Content container */
-    .container {
-      width: 90%;
-      max-width: 1000px;
-      margin: 20px auto;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-      color: #333;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    /* Search form styling */
-    .search-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .search-form input, .search-form button {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-
-    .search-form button {
-      background-color: #6F4E37;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    /* Table styling for search results */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 8px;
-      border: 1px solid #ddd;
-      text-align: left;
-    }
-
-    th {
-      background-color: #6F4E37;
-      color: #fff;
-    }
-
-    img {
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .action-link a {
-      color: #6F4E37;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    /* Mobile-first layout */
-    [class*="col-"] {
-      width: 100%;
-    }
-
-    /* Tablet view */
-    @media only screen and (min-width: 600px) {
-      .nav-bar {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .col-1 { width: 8.33%; }
-      .col-2 { width: 16.66%; }
-      .col-3 { width: 25%; }
-      .col-4 { width: 33.33%; }
-      .col-5 { width: 41.66%; }
-      .col-6 { width: 50%; }
-      .col-7 { width: 58.33%; }
-      .col-8 { width: 66.66%; }
-      .col-9 { width: 75%; }
-      .col-10 { width: 83.33%; }
-      .col-11 { width: 91.66%; }
-      .col-12 { width: 100%; }
-    }
-
-    /* Desktop view */
+    .row::after { content: ""; display: table; clear: both; }
+    [class*="col-"] { float: left; width: 100%; margin: 0; }
     @media only screen and (min-width: 768px) {
-      .col-1 { width: 8.33%; }
-      .col-2 { width: 16.66%; }
-      .col-3 { width: 25%; }
-      .col-4 { width: 33.33%; }
-      .col-5 { width: 41.66%; }
-      .col-6 { width: 50%; }
-      .col-7 { width: 58.33%; }
-      .col-8 { width: 66.66%; }
-      .col-9 { width: 75%; }
-      .col-10 { width: 83.33%; }
-      .col-11 { width: 91.66%; }
-      .col-12 { width: 100%; }
+      .col-1 {width: 8.33%;}
+      .col-2 {width: 16.66%;}
+      .col-3 {width: 25%;}
+      .col-4 {width: 33.33%;}
+      .col-5 {width: 41.66%;}
+      .col-6 {width: 50%;}
+      .col-7 {width: 58.33%;}
+      .col-8 {width: 66.66%;}
+      .col-9 {width: 75%;}
+      .col-10 {width: 83.33%;}
+      .col-11 {width: 91.66%;}
+      .col-12 {width: 100%;}
     }
+
+    .header {
+      background-color: #999fff; color: #fff; text-align: center; overflow: auto; border: 0;
+    }
+    .header h1 { margin: 14px 0 2px 0; font-weight: 600; }
+    .header .sub { font-size: 12px; color: #eef; margin: 4px 0 10px 0; }
+
+    .login-box {
+      background-color: #f1f1f1; border-radius: 5px; box-shadow: 0 0 10px #ccc;
+      margin: 18px 0; overflow: auto;
+    }
+    .login-box h2 { text-align: center; margin: 18px 0 12px 0; font-weight: 600; }
+
+    /* Centrado del formulario SIN padding */
+    .center { text-align: center; }
+    .input-row {
+      display: flex; justify-content: center; align-items: center; gap: 10px;
+      margin: 10px 16px 0 16px;
+    }
+    .input-row input[type="text"] {
+      width: 70%; height: 34px; border: 1px solid #ccc; border-radius: 3px; outline: none; margin: 0;
+    }
+    .btn-submit {
+      background-color: #33b5e5; color: #fff; border: 0; border-radius: 3px;
+      height: 36px; line-height: 36px; min-width: 120px; cursor: pointer; margin: 0;
+    }
+    .btn-submit:hover { background-color: #0099cc; }
+
+    .links { text-align: center; margin: 8px 0 12px 0; }
+    .links a { color: #33b5e5; text-decoration: none; font-weight: bold; margin: 0 6px; }
+    .links a:hover { color: #0099cc; }
+
+    /* Resultados SIN padding */
+    .results-wrap { margin: 12px 16px 16px 16px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; text-align: left; line-height: 1.8; margin: 0; }
+    th { background: #ddd; color: #000; }
+    img.thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; display: block; margin: 4px 0; }
+    .muted { color: #666; text-align: center; }
+
+    /* Botón Add Friend SIN padding (altura/line-height) */
+    .btn {
+      display: inline-block; background-color: #33b5e5; color: #fff; text-decoration: none; font-weight: bold;
+      height: 30px; line-height: 30px; min-width: 110px; text-align: center; border-radius: 3px; border: 0; margin: 0;
+    }
+    .btn:hover { background-color: #0099cc; }
   </style>
 </head>
 <body>
-
 <%
-  // Retrieve the logged-in user's ID and username from the session
+  // --- Session guard ---
   Long userId = (Long) session.getAttribute("userId");
+  if (userId == null) { response.sendRedirect("loginHashing.jsp"); return; }
   String userName = (String) session.getAttribute("userName");
 
-  // If the session does not have a valid user, redirect to login
-  if (userId == null || userName == null) {
-    response.sendRedirect("loginHashing.html");
-    return;
-  }
-%>
+  // --- Page permission (Rule C.b) + last_page ---
+  applicationDBAuthenticationGoodComplete auth = new applicationDBAuthenticationGoodComplete();
+  String thisPage = "searchFriends.jsp";
+  boolean allowed = auth.canUserAccessPage(userId, thisPage);
+  if (allowed) { auth.setLastPage(userId, thisPage); }
 
-<!-- Top header bar -->
-<div class="taskbar col-12">
-  <h1>minifacebook</h1>
-</div>
+  // --- Read query keyword (keep it across add friend) ---
+  String q = request.getParameter("q");
+  String qEnc = "";
+  try { qEnc = (q == null) ? "" : java.net.URLEncoder.encode(q, "UTF-8"); } catch (Exception ignore) {}
 
-<!-- Navigation menu -->
-<div class="nav-bar col-12">
-  <div class="nav-left col-6">Welcome, <%= userName %>!</div>
-  <div class="nav-right col-6">
-    <a href="welcomeMenu.jsp">Home</a>
-    <a href="profile.jsp">Profile</a>
-    <a href="friendList.jsp">Friend List</a>
-    <a href="signout.jsp">Sign Out</a>
-  </div>
-</div>
+  // --- Inline Add Friend (GET action): /searchFriends.jsp?add=1&friendId=XX&q=... ---
+  String add = request.getParameter("add");
+  String friendIdParam = request.getParameter("friendId");
+  Integer addedFlag = null; // null=not attempted, 1=success, 0=failure
 
-<!-- Main content -->
-<div class="container col-12">
-  <h1>Search Friends</h1>
-  
-  <!-- Search form -->
-  <form class="search-form col-12" action="searchFriends.jsp" method="get">
-    <input type="text" id="searchQuery" name="searchQuery" placeholder="Search friends by name, location, etc." />
-    <button type="submit">Search</button>
-  </form>
-
-<%
-  // Get the search query parameter
-  String searchQuery = request.getParameter("searchQuery");
-
-  // If the user submitted a search term
-  if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-    FriendDAO friendDAO = new FriendDAO();
-    try {
-      // Search friends based on the provided query
-      ResultSet rs = friendDAO.searchFriends(searchQuery);
-%>
-  <!-- Results table -->
-  <table class="col-12">
-    <tr>
-      <th>Name</th>
-      <th>Age</th>
-      <th>Address</th>
-      <th>Profile Picture</th>
-      <th>Action</th>
-    </tr>
-<%
-      while(rs.next()) {
-        String friendName = rs.getString("name");
-        int age = rs.getInt("age");
-        String friendTown = rs.getString("town");
-        String friendState = rs.getString("state");
-        String friendCountry = rs.getString("country");
-        String profilePic = rs.getString("profile_picture");
-
-        // Use default profile picture if none is provided
-        if (profilePic == null || profilePic.trim().isEmpty()) {
-          profilePic = "cpen410/imagesjson/default-profile.png";
-        }
-
-        // Build the address string
-        String address = "";
-        if (friendTown != null && !friendTown.trim().isEmpty()) {
-          address += friendTown.trim();
-        }
-        if (friendState != null && !friendState.trim().isEmpty()) {
-          address += (address.isEmpty() ? "" : ", ") + friendState.trim();
-        }
-        if (friendCountry != null && !friendCountry.trim().isEmpty()) {
-          address += (address.isEmpty() ? "" : ", ") + friendCountry.trim();
-        }
-%>
-    <tr>
-      <td><%= friendName %></td>
-      <td><%= age %></td>
-      <td><%= address %></td>
-      <td>
-        <img src="<%= request.getContextPath() %>/<%= profilePic %>" alt="Profile Picture" width="50" height="50" />
-      </td>
-      <td class="photo">
-            <img src="<%= request.getContextPath() %>/images/<%= profilePic %>" width="50" height="50" alt="Profile Picture"/>
-      </td>
-
-    </tr>
-<%
+  if (allowed && "1".equals(add) && friendIdParam != null && friendIdParam.matches("\\d+")) {
+      long friendId = 0L;
+      try { friendId = Long.parseLong(friendIdParam); } catch (Exception ignore) {}
+      if (friendId > 0 && friendId != userId.longValue()) {
+          ut.JAR.CPEN410.Friendship fdao = new ut.JAR.CPEN410.Friendship();
+          boolean ok = false;
+          try {
+              ok = fdao.addFriend(userId, friendId);  // idempotent in DAO
+          } catch (Exception ex) {
+              ok = false;
+              ex.printStackTrace();
+          } finally {
+              try { fdao.close(); } catch (Exception ignore) {}
+          }
+          addedFlag = ok ? 1 : 0;
+      } else {
+          addedFlag = 0;
       }
-      rs.close();
-      friendDAO.close();
-    } catch(Exception e) {
-      out.println("Error searching for friends: " + e.getMessage());
-      e.printStackTrace();
-    }
+  }
+
+  // --- Run search if there's a keyword ---
+  java.sql.ResultSet rs = null;
+  ut.JAR.CPEN410.SearchFriend sf = null;
+  boolean runSearch = (q != null && q.trim().length() > 0 && allowed);
+  if (runSearch) {
+      sf = new ut.JAR.CPEN410.SearchFriend();
+      rs = sf.searchFriend(q);
   }
 %>
-  </table>
-</div>
 
+  <div class="taskbar">
+    <h1>minifacebook</h1>
+    <p style="color:#ddd; font-size:12px;">Logged in as: <%= userName %></p>
+  </div>
+
+  <div class="nav-bar">
+    <div style="color:#fff; font-weight:bold;">Search Friends</div>
+    <div class="nav-links">
+      <a href="welcomeMenu.jsp">Home</a>
+      <a href="friendList.jsp">Friend List</a>
+      <a href="profile.jsp">Profile</a>
+      <a href="signout.jsp">Sign Out</a>
+    </div>
+  </div>
+
+  <div class="container">
+<% if (!allowed) { %>
+      <h2 style="text-align:center; margin: 10px 0;">Access Denied</h2>
+      <p style="text-align:center; margin: 6px 0;">Your role is not authorized for this page.</p>
+<% } else { %>
+      <!-- Search bar (GET) -->
+      <form class="searchbar" method="get" action="searchFriends.jsp" style="display:flex; justify-content:center; gap:6px; margin:10px 0;">
+        <input type="text" name="q" placeholder="Search by name, email, town, state, country, gender or age..." value="<%= (q==null? "" : q) %>"/>
+        <input type="submit" value="Search"/>
+      </form>
+
+      <!-- Inline add-friend feedback -->
+<%    if (addedFlag != null) { %>
+        <% if (addedFlag == 1) { %>
+          <div style="text-align:center; color:#2d6a2d; margin:8px 0;">Friend added successfully.</div>
+        <% } else { %>
+          <div style="text-align:center; color:#a33; margin:8px 0;">Could not add friend (already friends or invalid request).</div>
+        <% } %>
+<%    } %>
+
+<%    if (runSearch) { %>
+      <table>
+        <tr>
+          <th>Photo</th>
+          <th>Name</th>
+          <th>Gender</th>
+          <th>Age</th>
+          <th>Address</th>
+          <th>Action</th>
+        </tr>
+<%
+        boolean any = false;
+        while (rs != null && rs.next()) {
+            any = true;
+            long uid = rs.getLong("id");
+            String nm = rs.getString("name");
+            String gd = rs.getString("gender");
+            int age   = rs.getInt("age");
+            String tw = rs.getString("town");
+            String st = rs.getString("state");
+            String co = rs.getString("country");
+            String img = rs.getString("profile_picture");
+            if (img == null || img.trim().isEmpty()) img = "cpen410/imagesjson/default-profile.png";
+
+            String addr = "";
+            if (tw != null && !tw.isEmpty()) addr += tw;
+            if (st != null && !st.isEmpty()) addr += (addr.isEmpty() ? "" : ", ") + st;
+            if (co != null && !co.isEmpty()) addr += (addr.isEmpty() ? "" : ", ") + co;
+%>
+        <tr>
+          <td><img class="thumb" src="<%= request.getContextPath() %>/<%= img %>" alt="photo"/></td>
+          <td><%= nm %></td>
+          <td><%= gd %></td>
+          <td><%= age %></td>
+          <td><%= addr.isEmpty() ? "-" : addr %></td>
+          <td>
+            <% if (uid != userId) { %>
+              <a href="searchFriends.jsp?q=<%= qEnc %>&add=1&friendId=<%= uid %>">Add Friend</a>
+            <% } else { %> — <% } %>
+          </td>
+        </tr>
+<%
+        }
+        if (!any) {
+%>
+        <tr><td colspan="6" style="text-align:center; color:#666;">No results found.</td></tr>
+<%
+        }
+%>
+      </table>
+<%    } %>
+<% } %>
+  </div>
+
+<%
+  // --- Cleanup ---
+  if (rs != null) try { rs.close(); } catch (Exception ignore) {}
+  if (sf != null) try { sf.close(); } catch (Exception ignore) {}
+  try { auth.close(); } catch (Exception ignore) {}
+%>
 </body>
-</html>
-
