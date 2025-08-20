@@ -21,7 +21,7 @@
 
       /* Top taskbar */
       .taskbar {
-        background-color: #6F4E37;
+        background-color: #999fff; /* matches login header */
         color: #fff;
         padding: 10px 20px;
         text-align: center;
@@ -29,7 +29,7 @@
 
       /* Navigation bar */
       .nav-bar {
-        background-color: #6F4E37;
+        background-color: #999fff; /* same tone as header */
         padding: 10px 20px;
         display: flex;
         flex-direction: column;
@@ -55,10 +55,11 @@
         padding: 6px 10px;
         border-radius: 4px;
         transition: background-color 0.3s ease;
+        background-color: #33b5e5; /* button color */
       }
 
       .nav-links a:hover {
-        background-color: #8c6d54;
+        background-color: #0099cc; /* hover color */
       }
 
       /* Friend photos gallery */
@@ -136,7 +137,7 @@
 %>
 
     <div class="taskbar">
-      <h1>minifacebook</h1>
+      <h1>MiniFacebook</h1>
     </div>
 
     <div class="nav-bar">
@@ -154,26 +155,9 @@
     </div>
 
     <div class="friend-gallery">
-<%
-    ProfileDAO dao = new ProfileDAO();
-    ResultSet rsFriendPhotos = dao.getFriendPhotos(userId);
 
-    while(rsFriendPhotos.next()) {
-        String friendPhotoURL = rsFriendPhotos.getString("image_url");
-        String friendName = rsFriendPhotos.getString("name");
-%>
-      <div class="friend-photo col-4">
-        <img src="/<%= friendPhotoURL %>" alt="Photo by <%= friendName %>">
-        <p><%= friendName %></p>
-      </div>
-<%
-    }
-    rsFriendPhotos.close();
-    dao.close();
-%>
     </div>
 
   </body>
 </html>
-
 
