@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - MiniFacebook</title>
   <style>
+    /* (Style kept exactly as provided) */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -145,6 +146,7 @@
   </style>
 </head>
 <body>
+  <!-- Page header (kept as-is) -->
   <div class="header">
     <h1>MiniFacebook</h1>
   </div>
@@ -155,11 +157,16 @@
       <div class="login-box">
         <h2>Login</h2>
 <%
+  //________________________________________________________________
+  // Read submitted credentials (if any). If null, show the login form.
+  // The form posts back to this same JSP (loginHashing.jsp).
+  //
   String userName = request.getParameter("userName");
   String userPass = request.getParameter("userPass");
 
   if (userName == null || userPass == null) {
 %>
+        <!-- Render login form when there are no submitted credentials yet -->
         <form action="loginHashing.jsp" method="post">
           <div class="form-group">
             <label for="userName">Email / Username:</label>
@@ -178,34 +185,81 @@
         </div>
 <%
   } else {
+    // _____________________________________________________________
+    // Credentials were submitted. We now authenticate against the DB,
+    // obtain the user's role CODE (ADMIN/USER), validate page access,
+    // and update last_page_id if allowed.
+    // DB access is encapsulated in the Java class (per course rules).
+    // 
     applicationDBAuthenticationGoodComplete auth = new applicationDBAuthenticationGoodComplete();
-    ResultSet rs = auth.authenticate(userName, userPass);
+    ResultSet rs = auth.authenticate(userName, userPass);  // uses SHA2 hashing in SQL
 
     if (rs != null && rs.next()) {
+      // Pull minimal user profile
       long userId = rs.getLong("id");
       String name = rs.getString("name");
+      // Close the statement behind this ResultSet to avoid leaks
+      
+
+      // Save identity in the session for subsequent pages
       session.setAttribute("user", userName);
       session.setAttribute("userId", userId);
       session.setAttribute("userName", userName);
       session.setAttribute("name", name);
 
-      String role = auth.getUserRole(userId);
+      // IMPORTANT: get role CODE ('ADMIN' or 'USER'), not display name
+      String role = auth.getUserRoleCode(userId);
       session.setAttribute("role", role);
 
+      // Target pages (must exist in webPageGood.pageURL exactly as written)
+      String userHome  = "welcomeMenu.jsp";
+      String adminHome = "adminDashboard.jsp";
+
       if ("ADMIN".equalsIgnoreCase(role)) {
-        response.sendRedirect("adminDashboard.jsp");
+        // Validate ADMIN's access to admin dashboard via rolewebpagegood
+        boolean adminAllowed = auth.canUserAccessPage(userId, adminHome);
+        if (adminAllowed) {
+          // Track last visited page
+          auth.setLastPage(userId, adminHome);
+          auth.close();
+          response.sendRedirect(adminHome);
+        } else {
+%>
+        <div class="error-container">
+          <h2>Access Denied</h2>
+          <p>You don't have permission to access adminDashboard.jsp. <a href="loginHashing.jsp">Go back</a></p>
+        </div>
+<%
+          auth.close();
+        }
       } else {
-        response.sendRedirect("welcomeMenu.jsp");
+        // Validate USER's access to the user home page
+        boolean userAllowed = auth.canUserAccessPage(userId, userHome);
+        if (userAllowed) {
+          // Track last visited page
+          auth.setLastPage(userId, userHome);
+          auth.close();
+          response.sendRedirect(userHome);
+        } else {
+%>
+        <div class="error-container">
+          <h2>Access Denied</h2>
+          <p>You don't have permission to access <%= userHome %>. <a href="loginHashing.jsp">Go back</a></p>
+        </div>
+<%
+          auth.close();
+        }
       }
     } else {
+      // Authentication failed (no match for email+hashed password)
 %>
         <div class="error-container">
           <h2>Login Failed</h2>
           <p>Invalid credentials. <a href="loginHashing.jsp">Try again</a></p>
         </div>
 <%
+      auth.close();
     }
-    auth.close();
   }
 %>
       </div>
