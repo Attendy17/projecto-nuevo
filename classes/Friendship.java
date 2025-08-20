@@ -4,35 +4,81 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Clase para manejar listas de amigos.
+ * Friendship
+ * ---------------------------------------------------------------------------
+ * Minimal DAO for friendship features with an undirected, simplified model:
+ *  • addFriend(meId, friendId): stores a single symmetric edge (min,max)
+ *  • listFriends(meId): lists all friends of a user
+ *
+ * Assumptions:
+ *  • Table friendships has UNIQUE(user1_id, user2_id)
+ *  • Undirected edge stored as (min(meId, friendId), max(meId, friendId))
+ *  • Optional created_at column (TIMESTAMP/CURRENT_TIMESTAMP default is fine)
+ *
+ * Constraints (course rules):
+ *  • Statement-based via MySQLCompleteConnector (NO PreparedStatement)
+ *  • SQL access is encapsulated in Java (no SQL in JSPs)
  */
 public class Friendship {
 
-    private final MySQLCompleteConnector connector;
+    private final MySQLCompleteConnector db;
 
     public Friendship() {
-        connector = new MySQLCompleteConnector();
-        connector.doConnection();
+        db = new MySQLCompleteConnector();
+        db.doConnection();
+    }
+
+    /* ___________________________ Helpers ___________________________ */
+
+    /** Returns true if a friendship already exists between A and B. */
+    public boolean isFriends(long a, long b) {
+        long u1 = Math.min(a, b);
+        long u2 = Math.max(a, b);
+        ResultSet rs = db.doSelect("COUNT(*)", "friendships", "user1_id=" + u1 + " AND user2_id=" + u2);
+        try {
+            if (rs != null && rs.next()) {
+                long c = rs.getLong(1);
+                rs.close();
+                return c > 0;
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
     }
 
     /**
-     * Devuelve la lista de amigos con detalles: id, name, profile_picture, fecha de amistad.
+     * Adds a friendship. Idempotent: if it already exists, returns true.
      */
-    public ResultSet listFriendsWithDetails(long userId) throws SQLException {
-        String query = "SELECT f.id AS friendship_id, " +
-                       "CASE WHEN f.user1_id=" + userId + " THEN u2.id ELSE u1.id END AS friend_id, " +
-                       "CASE WHEN f.user1_id=" + userId + " THEN u2.name ELSE u1.name END AS friend_name, " +
-                       "CASE WHEN f.user1_id=" + userId + " THEN u2.profile_picture ELSE u1.profile_picture END AS profile_picture, " +
-                       "f.created_at " +
-                       "FROM friendships f " +
-                       "LEFT JOIN users u1 ON f.user1_id = u1.id " +
-                       "LEFT JOIN users u2 ON f.user2_id = u2.id " +
-                       "WHERE f.status='accepted' AND (f.user1_id=" + userId + " OR f.user2_id=" + userId + ") " +
-                       "ORDER BY f.created_at DESC";
-        return connector.doRawQuery(query);
+    public boolean addFriend(long meId, long friendId) {
+        if (meId == friendId) return false; // prevent self friendship
+
+        long u1 = Math.min(meId, friendId);
+        long u2 = Math.max(meId, friendId);
+
+        if (isFriends(meId, friendId)) return true;
+
+        // Insert symmetric edge
+        db.doInsert("friendships(user1_id, user2_id, created_at)", u1 + "," + u2 + ", CURRENT_TIMESTAMP");
+        // Confirm
+        return isFriends(meId, friendId);
+    }
+
+    /**
+     * Lists all friends of the user.
+     * Returns: u.id, u.name, u.email, u.profile_picture, u.gender, age
+     */
+    public ResultSet listFriends(long meId) {
+        String fields =
+              "u.id, u.name, u.email, u.profile_picture, u.gender, "
+            + "TIMESTAMPDIFF(YEAR, u.birth_date, CURDATE()) AS age";
+        String tables =
+              "friendships f "
+            + "JOIN users u ON u.id = CASE WHEN f.user1_id=" + meId + " THEN f.user2_id ELSE f.user1_id END";
+        String where =
+              meId + " IN (f.user1_id, f.user2_id)";
+        return db.doSelect(fields, tables, where);
     }
 
     public void close() {
-        connector.closeConnection();
+        db.closeConnection();
     }
 }
