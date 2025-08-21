@@ -79,34 +79,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
+  <!-- Responsive view as in the guide -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add Friend - MiniFacebook</title>
   <style>
-    /* Same look as login, without padding anywhere */
-    * { box-sizing: border-box; margin: 0; }
-    html { font-family: "Lucida Sans", sans-serif; }
-    body { background-color: #ffffff; margin: 0; }
-    .row::after { content: ""; display: table; clear: both; }
-    [class*="col-"] { float: left; width: 100%; margin: 0; }
-    @media only screen and (min-width: 768px) { .col-3 { width:25%; } .col-6 { width:50%; } }
-    .header { background:#999fff; color:#fff; text-align:center; border:0; }
-    .header h1 { margin:14px 0 2px 0; font-weight:600; }
-    .login-box { background:#f1f1f1; border-radius:5px; box-shadow:0 0 10px #ccc; margin:18px 0; }
-    .login-box h2 { text-align:center; margin:18px 0 12px 0; font-weight:600; }
-    .msg { text-align:center; color:#a33; margin:14px 0 18px 0; }
-    .links { text-align:center; margin:8px 0 14px 0; }
-    .links a { color:#33b5e5; text-decoration:none; font-weight:bold; margin:0 6px; }
-    .links a:hover { color:#0099cc; }
+    /* Base styles (same look & feel, now with padding reset) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-family: "Lucida Sans", sans-serif;
+    }
+
+    body {
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Row with clearfix (as in the guide) */
+    .row::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+
+    /* Mobile-first columns (as in the guide) */
+    [class*="col-"] {
+      float: left;
+      width: 100%;
+      padding: 15px;
+    }
+
+    /* Desktop grid system (as in the guide) */
+    @media only screen and (min-width: 768px) {
+      .col-1  { width: 8.33%; }
+      .col-2  { width: 16.66%; }
+      .col-3  { width: 25%; }
+      .col-4  { width: 33.33%; }
+      .col-5  { width: 41.66%; }
+      .col-6  { width: 50%; }
+      .col-7  { width: 58.33%; }
+      .col-8  { width: 66.66%; }
+      .col-9  { width: 75%; }
+      .col-10 { width: 83.33%; }
+      .col-11 { width: 91.66%; }
+      .col-12 { width: 100%; }
+    }
+
+    /* Header (same original palette) */
+    .header {
+      background-color: #999fff;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      border: 0;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    /* Center box */
+    .login-box {
+      background-color: #f1f1f1;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px #ccc;
+      margin-top: 20px;
+    }
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    /* Error message */
+    .msg {
+      text-align: center;
+      color: #a33;
+      margin: 15px 0 20px 0;
+    }
+
+    /* Navigation links */
+    .links {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .links a {
+      color: #33b5e5;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 0 6px;
+    }
+
+    .links a:hover {
+      color: #0099cc;
+    }
   </style>
 </head>
 <body>
-  <div class="header"><h1>MiniFacebook</h1></div>
+  <!-- Main Header -->
+  <div class="header">
+    <h1>MiniFacebook</h1>
+  </div>
+
   <div class="row">
     <div class="col-3"></div>
     <div class="col-6">
       <div class="login-box">
         <h2>Add Friend</h2>
-        <div class="msg">Access Denied: your role is not authorized for this page.</div>
+        <div class="msg">
+          Access Denied: your role is not authorized for this page.
+        </div>
         <div class="links">
           <a href="welcomeMenu.jsp">Home</a> |
           <a href="friendList.jsp">Friend List</a> |
@@ -119,3 +211,4 @@
 </body>
 </html>
 <% } %>
+
