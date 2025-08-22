@@ -154,10 +154,48 @@
       <h2>Friend Photo Posts</h2>
     </div>
 
-    <div class="friend-gallery">
+        <div class="friend-gallery">
+<%
+    // Cargar últimas fotos de amistades (máximo 30)
+    ut.JAR.CPEN410.Friendship fr = new ut.JAR.CPEN410.Friendship();
+    java.sql.ResultSet feed = null;
+    try {
+        feed = fr.getFriendsPhotos(userId, 30);
 
+        boolean any = false;
+        while (feed != null && feed.next()) {
+            any = true;
+            String img    = feed.getString("image_url"); // p.ej: cpen410/imagesjson/userpost/...
+            String poster = feed.getString("name");      // nombre del amigo que publicó
+
+            if (img == null || img.trim().isEmpty()) {
+                img = "cpen410/imagesjson/default-profile.png";
+            }
+%>
+      <div class="friend-photo">
+        <img src="<%= request.getContextPath() %>/<%= img %>" alt="Friend Photo"/>
+        <p><%= poster %></p>
+      </div>
+<%
+        }
+
+        if (!any) {
+%>
+      <p style="text-align:center; width:100%; color:#666;">No recent friend photos.</p>
+<%
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+%>
+      <p style="text-align:center; width:100%; color:#a33;">Error loading friend posts.</p>
+<%
+    } finally {
+        try { if (feed != null) feed.close(); } catch (Exception ignore) {}
+        try { fr.close(); } catch (Exception ignore) {}
+    }
+%>
     </div>
+
 
   </body>
 </html>
-

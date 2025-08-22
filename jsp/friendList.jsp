@@ -180,6 +180,14 @@
     </div>
   </div>
 
+  <div class="links">
+          <a href="welcomeMenu.jsp">Home</a>
+          <a href="searchFriends.jsp">Search Friends</a>
+          <a href="profile.jsp">Profile</a>
+          <a href="signout.jsp">Sign Out</a>
+  </div>
+  
+
   <!-- Friend list content -->
   <div class="row">
     <div class="col-3"></div>
@@ -222,12 +230,7 @@
 %>
           </table>
         </div>
-        <div class="links">
-          <a href="welcomeMenu.jsp">Home</a>
-          <a href="searchFriends.jsp">Search Friends</a>
-          <a href="profile.jsp">Profile</a>
-          <a href="signout.jsp">Sign Out</a>
-        </div>
+        
       </div>
     </div>
     <div class="col-3"></div>

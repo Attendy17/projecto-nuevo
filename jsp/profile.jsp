@@ -44,6 +44,20 @@
     .links { text-align: center; margin-top: 16px; }
     .links a { color: #33b5e5; text-decoration: none; font-weight: bold; margin: 0 8px; }
     .links a:hover { color: #0099cc; }
+      .center { text-align: center; }
+    .file { width: 100%; max-width: 320px; }
+    .btn {
+    background-color: #33b5e5; color:#fff; border:0; border-radius:3px;
+    padding: 8px 14px; cursor:pointer;
+  }
+  .btn:hover { background-color:#0099cc; }
+
+  .gallery { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+  .photo-card { width: 220px; border:1px solid #ddd; border-radius:6px; background:#fff; padding:10px; text-align:center; }
+  .thumb { width: 200px; height: auto; border-radius:4px; }
+  .note { margin-top:6px; color:#666; font-size:12px; text-align:center; }
+
+    
   </style>
 </head>
 <body>
@@ -80,8 +94,10 @@
   }
   auth.setLastPage(userId, thisPage);
 
-  // --- Load profile data via DAO (no SQL in JSP)
+  // --- DAO: profile + photos
   Profile p = new Profile();
+
+  // Basic profile
   ResultSet rs = p.getOwnProfile(userId);
   String name = "-";
   String email = "-";
@@ -99,7 +115,11 @@
       dob = rs.getDate("birth_date");
   }
   if (rs != null) try { rs.close(); } catch (Exception ignore) {}
-  p.close();
+
+  // Photo gallery (images)
+  ResultSet rsPhotos = p.getUserPhotos(userId);
+
+  // close auth (DAO p lo cerramos después de la galería)
   auth.close();
 %>
 
@@ -107,6 +127,7 @@
     <h1>MiniFacebook</h1>
   </div>
 
+  <!-- BOX: Datos del perfil -->
   <div class="row">
     <div class="col-3"></div>
     <div class="col-6">
@@ -136,6 +157,86 @@
           <a href="searchFriends.jsp">Search Friends</a>
           <a href="friendList.jsp">Friend List</a>
           <a href="signout.jsp">Sign Out</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- BOX: Cambiar foto de perfil -->
+  <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+      <div class="box">
+        <div class="title"><h2>Change Profile Picture</h2></div>
+        <div class="center">
+          <form action="uploadPhoto.jsp" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="target" value="profile"/>
+            <input class="file" type="file" name="photoFile" accept="image/*" required />
+            <div style="margin-top:10px;">
+              <button class="btn" type="submit">Update Profile Picture</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- BOX: Publicar foto -->
+  <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+      <div class="box">
+        <div class="title"><h2>Publish New Photo</h2></div>
+        <div class="center">
+          <form action="uploadPhoto.jsp" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="target" value="post"/>
+            <input class="file" type="file" name="photoFile" accept="image/*" required />
+            <div style="margin-top:10px;">
+              <button class="btn" type="submit">Publish</button>
+            </div>
+          </form>   
+        </div>
+      </div>
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- BOX: Galería -->
+  <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+      <div class="box">
+        <div class="title"><h2>My Photo Gallery</h2></div>
+
+        <div class="gallery">
+<%
+          boolean any = false;
+          while (rsPhotos != null && rsPhotos.next()) {
+              any = true;
+              long photoId = rsPhotos.getLong("id");
+              String imageUrl = rsPhotos.getString("image_url");
+%>
+          <div class="photo-card">
+            <img class="thumb" src="<%= request.getContextPath() %>/<%= imageUrl %>" alt="Photo"/>
+            <form action="deletePhoto.jsp" method="post" onsubmit="return confirm('Delete this photo?');">
+              <input type="hidden" name="photoId" value="<%= photoId %>"/>
+              <div style="margin-top:6px;">
+                <button class="btn" type="submit">Delete</button>
+              </div>
+            </form>
+          </div>
+<%
+          }
+          if (!any) {
+%>
+          <p class="center" style="width:100%;">No photos yet.</p>
+<%
+          }
+          if (rsPhotos != null) try { rsPhotos.close(); } catch (Exception ignore) {}
+          p.close();
+%>
         </div>
       </div>
     </div>

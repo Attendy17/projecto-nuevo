@@ -257,7 +257,7 @@
 %>
       </table>
       <p style="text-align:center; margin-top: 15px;">
-        <a class="button" href="addUserAdmin.jsp">Add New User</a>
+        <a class="button" href="addUserAD.jsp">Add New User</a>
       </p>
     </div>
   </body>

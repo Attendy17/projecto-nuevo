@@ -181,7 +181,7 @@
           </div>
         </form>
         <div class="signup-link">
-          <p>Don't have an account? <a href="newUser.html">Register here</a></p>
+          <p>Don't have an account? <a href="singup.jsp">Register here</a></p>
         </div>
 <%
   } else {
