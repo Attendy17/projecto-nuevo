@@ -11,9 +11,17 @@ import java.sql.*;
  */
 public class MySQLCompleteConnector {
 
-    // Database URL updated to the schema 'cpen410p1'
-    private String DB_URL = "jdbc:mysql://localhost/cpen410p1";
-    // If you use the root user with password 1234, update these credentials as needed:
+    // Database URL (schema 'cpen410p1') con parámetros para evitar "Public Key Retrieval is not allowed"
+    // Ajusta host/puerto si aplica.
+    private String DB_URL =
+        "jdbc:mysql://localhost:3306/cpen410p1"
+      + "?useUnicode=true"
+      + "&characterEncoding=UTF-8"
+      + "&serverTimezone=UTC"
+      + "&allowPublicKeyRetrieval=true"
+      + "&useSSL=false";
+
+    // Credenciales (ajusta según tu entorno)
     private String USER = "root";
     private String PASS = "1234";
 
@@ -37,18 +45,24 @@ public class MySQLCompleteConnector {
      */
     public void doConnection() {
         try {
-            // Register the JDBC driver.
-            // For recent versions, it is recommended to use "com.mysql.cj.jdbc.Driver".
-            Class.forName("com.mysql.jdbc.Driver")
-                 .getDeclaredConstructor()
-                 .newInstance();
+            // Cargar driver (primero Connector/J 8, fallback a legacy si está disponible)
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                // Compatibilidad con jars antiguos
+                Class.forName("com.mysql.jdbc.Driver");
+            }
+
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             System.out.println("Creating statement...");
             stmt = conn.createStatement();
             System.out.println("Statement OK...");
         } catch(Exception e) {
+            // Deja traza y asegura objetos en null
             e.printStackTrace();
+            conn = null;
+            stmt = null;
         }
     }
 
@@ -62,17 +76,33 @@ public class MySQLCompleteConnector {
     }
 
     /**
+     * Returns the current Statement object.
+     * (Algunas clases tuyas lo necesitan, p.ej. setLastPage()).
+     *
+     * @return the Statement object used by this connector.
+     */
+    public Statement getStatement() {
+        return stmt;
+    }
+
+    /**
      * Closes the Statement and Connection objects to free up resources.
      */
     public void closeConnection() {
         try {
             if (stmt != null)
                 stmt.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        try {
             if (conn != null)
                 conn.close();
         } catch(Exception e) {
             e.printStackTrace();
         }
+        stmt = null;
+        conn  = null;
     }
 
     /**
@@ -88,7 +118,11 @@ public class MySQLCompleteConnector {
         String selectionStatement = "SELECT " + fields + " FROM " + tables + " WHERE " + where + ";";
         System.out.println(selectionStatement);
         try {
-            result = stmt.executeQuery(selectionStatement);
+            if (stmt != null) {
+                result = stmt.executeQuery(selectionStatement);
+            } else {
+                System.err.println("doSelect: Statement is null (no connection).");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -107,7 +141,11 @@ public class MySQLCompleteConnector {
         String selectionStatement = "SELECT " + fields + " FROM " + tables + ";";
         System.out.println(selectionStatement);
         try {
-            result = stmt.executeQuery(selectionStatement);
+            if (stmt != null) {
+                result = stmt.executeQuery(selectionStatement);
+            } else {
+                System.err.println("doSelect: Statement is null (no connection).");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,17 +157,23 @@ public class MySQLCompleteConnector {
      *
      * <p>This method is less recommended because it relies on the table structure.</p>
      *
-     * @param table  the table into which data will be inserted.
+     * @param table  the table into which data will be inserted. (Puedes pasar "tabla(col1,col2,...)")
      * @param values the values to insert.
-     * @return true if the insertion executed successfully, false otherwise.
+     * @return true if the insertion executed successfully (execute() retornó sin excepción), false otherwise.
      */
     public boolean doInsert(String table, String values) {
         boolean res = false;
         String insertionStatement = "INSERT INTO " + table + " VALUES (" + values + ");";
         System.out.println(insertionStatement);
         try {
-            res = stmt.execute(insertionStatement);
-            System.out.println("Insertion executed: " + res);
+            if (stmt != null) {
+                // Nota: execute() devuelve true si hay ResultSet; para INSERT suele devolver false.
+                // Tu lógica superior revalida con un SELECT posterior, así que mantenemos este comportamiento.
+                res = stmt.execute(insertionStatement);
+                System.out.println("Insertion executed (execute() returned): " + res);
+            } else {
+                System.err.println("doInsert: Statement is null (no connection).");
+            }
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -151,9 +195,13 @@ public class MySQLCompleteConnector {
         String insertionStatement = "INSERT INTO " + table + " (" + columns + ") VALUES (" + values + ");";
         System.out.println(insertionStatement);
         try {
-            int rows = stmt.executeUpdate(insertionStatement);
-            System.out.println("Rows inserted: " + rows);
-            res = (rows > 0);
+            if (stmt != null) {
+                int rows = stmt.executeUpdate(insertionStatement);
+                System.out.println("Rows inserted: " + rows);
+                res = (rows > 0);
+            } else {
+                System.err.println("doInsert (3-params): Statement is null (no connection).");
+            }
         } catch(Exception e) {
             e.printStackTrace();
         }

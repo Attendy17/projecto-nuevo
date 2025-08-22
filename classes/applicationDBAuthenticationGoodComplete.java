@@ -275,4 +275,3 @@ public class applicationDBAuthenticationGoodComplete {
         myDBConn.closeConnection();
     }
 }
-
