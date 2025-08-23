@@ -2,19 +2,26 @@
 <%@ page import="ut.JAR.CPEN410.Profile" %>
 <%@ page import="ut.JAR.CPEN410.applicationDBAuthenticationGoodComplete" %>
 <%@ page import="java.sql.ResultSet, java.sql.Date" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <title>My Profile - MiniFacebook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <style>
-    /* Same visual style as your login page */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* responsive grid (mobile-first columns) */
+    * { box-sizing: border-box; }
     html { font-family: "Lucida Sans", sans-serif; }
-    body { background-color: #ffffff; margin: 0; }
+    body { background-color: #ffffff; margin: 0; color:#333; }
+
     .row::after { content: ""; clear: both; display: table; }
+
+    /* full-width on mobile */
     [class*="col-"] { float: left; width: 100%; padding: 15px; }
 
+    /* desktop column widths */
     @media only screen and (min-width: 768px) {
       .col-1 {width: 8.33%;}
       .col-2 {width: 16.66%;}
@@ -30,217 +37,133 @@
       .col-12 {width: 100%;}
     }
 
-    .header { background-color: #999fff; color: white; text-align: center; padding: 15px; }
-    .box { background-color: #f1f1f1; border-radius: 5px; box-shadow: 0 0 10px #ccc; padding: 20px; }
+    /* header */
+    .header { background-color: #9933cc; color: #ffffff; text-align: center; padding: 15px; }
+    .header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+    .sub { font-size: 12px; color: #efeaff; margin-top: 4px; }
+
+    /* top taskbar with hover */
+    .taskbar { background-color: #33b5e5; padding: 10px 15px; }
+    .taskbar-nav {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      list-style: none; margin: 0; padding: 0; justify-content: center;
+    }
+    .taskbar-nav li { display: inline-block; }
+    .taskbar-nav a {
+      display: inline-block; text-decoration: none; color: #ffffff;
+      padding: 8px 12px; border-radius: 4px;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    .taskbar-nav a:hover { background-color: #0099cc; transform: translateY(-1px); }
+
+    /* left menu */
+    .menu ul { list-style-type: none; margin: 0; padding: 0; }
+    .menu li {
+      padding: 8px; margin-bottom: 7px; background-color: #33b5e5; color: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      border-radius: 4px; transition: background-color 0.2s ease;
+    }
+    .menu li:hover { background-color: #0099cc; }
+    .menu li a { color: #ffffff; text-decoration: none; display: block; }
+
+    /* right aside */
+    .aside {
+      background-color: #33b5e5; padding: 15px; color: #ffffff; text-align: center; font-size: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      border-radius: 4px;
+    }
+
+    /* reusable card */
+    .box {
+      background-color: #f1f1f1; border-radius: 5px; box-shadow: 0 0 10px #ccc; padding: 20px;
+      border: 1px solid #e2e2e2;
+    }
 
     .title { text-align: center; margin-bottom: 12px; }
+    .center { text-align: center; }
+
+    /* profile avatar */
     .avatar-wrap { text-align: center; margin: 10px 0 16px 0; }
     .avatar { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; }
 
+    /* key-value details */
     .kv { display: grid; grid-template-columns: 160px 1fr; gap: 8px 14px; }
     .kv .k { font-weight: bold; color: #333; }
     .kv .v { color: #222; }
 
+    /* links row */
     .links { text-align: center; margin-top: 16px; }
     .links a { color: #33b5e5; text-decoration: none; font-weight: bold; margin: 0 8px; }
     .links a:hover { color: #0099cc; }
-      .center { text-align: center; }
+
+    /* file + button */
     .file { width: 100%; max-width: 320px; }
     .btn {
-    background-color: #33b5e5; color:#fff; border:0; border-radius:3px;
-    padding: 8px 14px; cursor:pointer;
-  }
-  .btn:hover { background-color:#0099cc; }
+      background-color: #33b5e5; color:#fff; border:0; border-radius:3px;
+      padding: 8px 14px; cursor:pointer; font-weight: 700;
+    }
+    .btn:hover { background-color:#0099cc; }
 
-  .gallery { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
-  .photo-card { width: 220px; border:1px solid #ddd; border-radius:6px; background:#fff; padding:10px; text-align:center; }
-  .thumb { width: 200px; height: auto; border-radius:4px; }
-  .note { margin-top:6px; color:#666; font-size:12px; text-align:center; }
+    /* gallery */
+    .gallery { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+    .photo-card { width: 220px; border:1px solid #ddd; border-radius:6px; background:#fff; padding:10px; text-align:center; }
+    .thumb { width: 200px; height: auto; border-radius:4px; }
+    .note { margin-top:6px; color:#666; font-size:12px; text-align:center; }
 
-    
+    /* footer */
+    .footer { background-color: #0099cc; color: #ffffff; text-align: center; font-size: 12px; padding: 15px; margin-top: 10px; }
   </style>
 </head>
 <body>
 <%
-  // --- Session guard ---
+  // session guard
   Long userId = (Long) session.getAttribute("userId");
   if (userId == null) { response.sendRedirect("loginHashing.jsp"); return; }
   String userName = (String) session.getAttribute("userName");
 
-  // --- Page permission (Rule C.b) + last_page ---
+  // page permission + last page tracking
   applicationDBAuthenticationGoodComplete auth = new applicationDBAuthenticationGoodComplete();
   String thisPage = "profile.jsp";
-  if (!auth.canUserAccessPage(userId, thisPage)) {
-      auth.close();
-%>
-  <div class="header"><h1>MiniFacebook</h1></div>
-  <div class="row"><div class="col-3"></div>
-    <div class="col-6"><div class="box">
-      <div class="title"><h2>My Profile</h2></div>
-      <p style="text-align:center; color:#a33;">Access Denied: your role is not authorized for this page.</p>
-      <div class="links">
-        <a href="welcomeMenu.jsp">Home</a> |
-        <a href="searchFriends.jsp">Search Friends</a> |
-        <a href="friendList.jsp">Friend List</a> |
-        <a href="signout.jsp">Sign Out</a>
-      </div>
-    </div></div>
-    <div class="col-3"></div>
-  </div>
-</body>
-</html>
-<%
-      return;
-  }
-  auth.setLastPage(userId, thisPage);
-
-  // --- DAO: profile + photos
-  Profile p = new Profile();
-
-  // Basic profile
-  ResultSet rs = p.getOwnProfile(userId);
-  String name = "-";
-  String email = "-";
-  String town = "-";
-  String pic = "cpen410/imagesjson/default-profile.png";
-  Date dob = null;
-
-  if (rs != null && rs.next()) {
-      String tmp;
-      tmp = rs.getString("name"); if (tmp != null && tmp.trim().length() > 0) name = tmp;
-      tmp = rs.getString("email"); if (tmp != null && tmp.trim().length() > 0) email = tmp;
-      tmp = rs.getString("town"); if (tmp != null && tmp.trim().length() > 0) town = tmp;
-      tmp = rs.getString("profile_picture");
-      if (tmp != null && tmp.trim().length() > 0) pic = tmp;
-      dob = rs.getDate("birth_date");
-  }
-  if (rs != null) try { rs.close(); } catch (Exception ignore) {}
-
-  // Photo gallery (images)
-  ResultSet rsPhotos = p.getUserPhotos(userId);
-
-  // close auth (DAO p lo cerramos después de la galería)
-  auth.close();
+  boolean allowed = auth.canUserAccessPage(userId, thisPage);
+  if (allowed) { auth.setLastPage(userId, thisPage); }
 %>
 
+  <!-- header -->
   <div class="header">
     <h1>MiniFacebook</h1>
+    <div class="sub"><%= allowed ? ("Logged in as: " + (userName==null?"User":userName)) : "Access denied" %></div>
   </div>
 
-  <!-- BOX: Datos del perfil -->
+  <!-- taskbar with hover -->
+  <nav class="taskbar">
+    <ul class="taskbar-nav">
+      <li><a href="welcomeMenu.jsp">Home</a></li>
+      <li><a href="friendList.jsp">Friends</a></li>
+      <li><a href="searchFriends.jsp">Search</a></li>
+      <li><a href="profile.jsp">Profile</a></li>
+      <li><a href="signout.jsp">Sign Out</a></li>
+    </ul>
+  </nav>
+
+  <!-- three-column layout -->
   <div class="row">
-    <div class="col-3"></div>
-    <div class="col-6">
+
+    <!-- left menu (col-3 desktop; full width on mobile) -->
+    <div class="col-3 menu">
+      <ul>
+        <li><a href="profile.jsp">My Profile</a></li>
+        <li><a href="friendList.jsp">Friend List</a></li>
+        <li><a href="searchFriends.jsp">Find Friends</a></li>
+        <li><a href="welcomeMenu.jsp">Home</a></li>
+      </ul>
+    </div>
+
+    <!-- main content (col-6 desktop; full width on mobile) -->
+    <div class="col-6 content">
+<%
+  if (!allowed) {
+      try { auth.close(); } catch (Exception ignore) {}
+%>
       <div class="box">
         <div class="title"><h2>My Profile</h2></div>
-
-        <div class="avatar-wrap">
-          <img class="avatar" src="<%= request.getContextPath() %>/<%= pic %>" alt="Profile Picture"/>
-        </div>
-
-        <div class="kv">
-          <div class="k">Name</div>
-          <div class="v"><%= name %></div>
-
-          <div class="k">Email</div>
-          <div class="v"><%= email %></div>
-
-          <div class="k">Birthday</div>
-          <div class="v"><%= (dob == null ? "-" : dob.toString()) %></div>
-
-          <div class="k">Town</div>
-          <div class="v"><%= town %></div>
-        </div>
-
-        <div class="links">
-          <a href="welcomeMenu.jsp">Home</a>
-          <a href="searchFriends.jsp">Search Friends</a>
-          <a href="friendList.jsp">Friend List</a>
-          <a href="signout.jsp">Sign Out</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-3"></div>
-  </div>
-
-  <!-- BOX: Cambiar foto de perfil -->
-  <div class="row">
-    <div class="col-3"></div>
-    <div class="col-6">
-      <div class="box">
-        <div class="title"><h2>Change Profile Picture</h2></div>
-        <div class="center">
-          <form action="uploadPhoto.jsp" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="target" value="profile"/>
-            <input class="file" type="file" name="photoFile" accept="image/*" required />
-            <div style="margin-top:10px;">
-              <button class="btn" type="submit">Update Profile Picture</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <div class="col-3"></div>
-  </div>
-
-  <!-- BOX: Publicar foto -->
-  <div class="row">
-    <div class="col-3"></div>
-    <div class="col-6">
-      <div class="box">
-        <div class="title"><h2>Publish New Photo</h2></div>
-        <div class="center">
-          <form action="uploadPhoto.jsp" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="target" value="post"/>
-            <input class="file" type="file" name="photoFile" accept="image/*" required />
-            <div style="margin-top:10px;">
-              <button class="btn" type="submit">Publish</button>
-            </div>
-          </form>   
-        </div>
-      </div>
-    </div>
-    <div class="col-3"></div>
-  </div>
-
-  <!-- BOX: Galería -->
-  <div class="row">
-    <div class="col-3"></div>
-    <div class="col-6">
-      <div class="box">
-        <div class="title"><h2>My Photo Gallery</h2></div>
-
-        <div class="gallery">
-<%
-          boolean any = false;
-          while (rsPhotos != null && rsPhotos.next()) {
-              any = true;
-              long photoId = rsPhotos.getLong("id");
-              String imageUrl = rsPhotos.getString("image_url");
-%>
-          <div class="photo-card">
-            <img class="thumb" src="<%= request.getContextPath() %>/<%= imageUrl %>" alt="Photo"/>
-            <form action="deletePhoto.jsp" method="post" onsubmit="return confirm('Delete this photo?');">
-              <input type="hidden" name="photoId" value="<%= photoId %>"/>
-              <div style="margin-top:6px;">
-                <button class="btn" type="submit">Delete</button>
-              </div>
-            </form>
-          </div>
-<%
-          }
-          if (!any) {
-%>
-          <p class="center" style="width:100%;">No photos yet.</p>
-<%
-          }
-          if (rsPhotos != null) try { rsPhotos.close(); } catch (Exception ignore) {}
-          p.close();
-%>
-        </div>
-      </div>
-    </div>
-    <div class="col-3"></div>
-  </div>
-</body>
-</html>
+        <p class="center" style="c
