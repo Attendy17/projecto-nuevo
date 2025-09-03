@@ -6,9 +6,8 @@ import java.sql.ResultSet;
 
 /**
  * AdminConn
- * ---------------------------------------------------------------------------
- * Admin DAO (Statement-based, sin PreparedStatement)
- * + Crear usuario y asignar rol (ADMIN/USER).
+ * Admin DAO (Statement-based, no PreparedStatement).
+ * + Create user and assign role (ADMIN/USER).
  */
 public class AdminConn {
 
@@ -19,9 +18,9 @@ public class AdminConn {
         db.doConnection();
     }
 
-    /* ------------------------------ Helpers ------------------------------ */
+    /* Helpers */
 
-    /** Escapa comillas simples para literales SQL. */
+    /* Escape single quotes for SQL literals. */
     private String esc(String s) {
         if (s == null) return "";
         StringBuilder sb = new StringBuilder(s.length() + 8);
@@ -31,9 +30,9 @@ public class AdminConn {
         return sb.toString();
     }
 
-    /* ===== NUEVO: helpers de usuario/rol ===== */
+    /* ===== NEW: user/role helpers ===== */
 
-    /** Devuelve id de usuario por email, o -1 si no existe. */
+    /* Returns user id by email, or -1 if it does not exist. */
     private long getUserIdByEmail(String email) {
         ResultSet rs = null;
         try {
@@ -47,7 +46,7 @@ public class AdminConn {
         return -1;
     }
 
-    /** Devuelve id de rol por code (ADMIN/USER), o -1 si no existe. */
+    /* Returns role id by code (ADMIN/USER), or -1 if it does not exist. */
     private long getRoleIdByCode(String code) {
         ResultSet rs = null;
         try {
@@ -61,7 +60,7 @@ public class AdminConn {
         return -1;
     }
 
-    /** Crea rol si no existe y devuelve su id. */
+    /* Create role if it does not exist and return its id. */
     private long ensureRole(String code, String name) {
         long rid = getRoleIdByCode(code);
         if (rid > 0) return rid;
@@ -79,9 +78,9 @@ public class AdminConn {
         return getRoleIdByCode(code);
     }
 
-    /* ------------------------------- Users ------------------------------- */
+    /* Users */
 
-    /** Lista simple de usuarios para el dashboard. */
+    /* Simple user list for dashboard. */
     public ResultSet listUsers() {
         return db.doSelect(
             "id, name, email, birth_date, gender, profile_picture",
@@ -89,7 +88,7 @@ public class AdminConn {
         );
     }
 
-    /** Obtiene a un usuario por id (básico). */
+    /* Get a user by id (basic). */
     public ResultSet getUserById(long userId) {
         String where = "id=" + userId + " LIMIT 1";
         return db.doSelect(
@@ -100,8 +99,8 @@ public class AdminConn {
     }
 
     /**
-     * NUEVO: Crea usuario (name,email,password hash, birth_date, gender).
-     * Retorna el nuevo userId (>0) o -1 si email duplicado / error.
+     * NEW: Create user (name,email,password hash, birth_date, gender).
+     * Returns the new userId (>0) or -1 if email is duplicated / error.
      */
     public long createUserBasic(String name, String email, String passwordPlain, String birthDate, String gender) {
         String nm = esc(name);
@@ -110,7 +109,7 @@ public class AdminConn {
         String bd = esc(birthDate);
         String gd = esc(gender);
 
-        // email único
+        // unique email
         ResultSet rs = null;
         Statement s = null;
         try {
@@ -128,7 +127,7 @@ public class AdminConn {
             );
             if (rows <= 0) return -1;
 
-            // reobtén por email (email es único)
+            // retrieve by email (email is unique)
             return getUserIdByEmail(email);
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,8 +138,8 @@ public class AdminConn {
     }
 
     /**
-     * NUEVO: Asigna un rol (ADMIN o USER) al usuario.
-     * Crea el rol en 'roles' si no existe y evita duplicados en 'user_roles'.
+     * NEW: Assign a role (ADMIN or USER) to the user.
+     * Creates the role in 'roles' if it does not exist and prevents duplicates in 'user_roles'.
      */
     public boolean assignRoleToUser(long userId, String roleCode) {
         String code = (roleCode == null ? "USER" : roleCode.trim().toUpperCase());
@@ -156,7 +155,7 @@ public class AdminConn {
             long cnt = 0;
             if (rs != null && rs.next()) cnt = rs.getLong(1);
             if (rs != null) { rs.close(); rs = null; }
-            if (cnt > 0) return true; // ya estaba
+            if (cnt > 0) return true; // already existed
 
             Connection c = db.getConnection();
             s = c.createStatement();
@@ -174,8 +173,8 @@ public class AdminConn {
     }
 
     /**
-     * Actualiza nombre, email, birth_date, gender.
-     * Verifica unicidad de email (permite mantener el mismo del usuario).
+     * Update name, email, birth_date, gender.
+     * Checks email uniqueness (allows keeping the same email for the user).
      */
     public boolean updateUserBasic(long userId, String name, String email, String birthDate, String gender) {
         String nm = esc(name);
@@ -194,7 +193,7 @@ public class AdminConn {
             if (rs != null && rs.next()) cnt = rs.getLong(1);
             if (rs != null) { rs.close(); rs = null; }
             if (cnt > 0) {
-                return false; // email duplicado
+                return false; // duplicated email
             }
 
             int rows = s.executeUpdate(
@@ -215,7 +214,7 @@ public class AdminConn {
         }
     }
 
-    /** Cambia la contraseña con SHA2. */
+    /* Change password with SHA2. */
     public boolean changePassword(long userId, String newPlain) {
         String pw = esc(newPlain);
         Statement s = null;
@@ -234,7 +233,7 @@ public class AdminConn {
         }
     }
 
-    /** Actualiza la ruta de la foto de perfil. */
+    /* Update profile picture path. */
     public boolean updateProfilePicture(long userId, String relativePath) {
         String rp = esc(relativePath);
         Statement s = null;
@@ -253,7 +252,7 @@ public class AdminConn {
         }
     }
 
-    /** Limpia (NULL) la foto de perfil. */
+    /* Set profile picture to NULL. */
     public boolean clearProfilePicture(long userId) {
         Statement s = null;
         try {
@@ -271,7 +270,7 @@ public class AdminConn {
         }
     }
 
-    /** Borra un usuario por id. */
+    /* Delete a user by id. */
     public boolean deleteUser(long userId) {
         Statement st = null;
         try {
@@ -287,7 +286,7 @@ public class AdminConn {
         }
     }
 
-    /* ------------------------------ Address ------------------------------ */
+    /* Address */
 
     public ResultSet getAddress(long userId) {
         return db.doSelect(
@@ -338,7 +337,7 @@ public class AdminConn {
         }
     }
 
-    /* ------------------------------ Education ---------------------------- */
+    /* Education */
 
     public ResultSet listEducation(long userId) {
         String where = "user_id=" + userId + " ORDER BY id DESC";
@@ -407,7 +406,7 @@ public class AdminConn {
         }
     }
 
-    /* ------------------------------- Photos ------------------------------ */
+    /* Photos */
 
     public ResultSet getUserPhotos(long userId) {
         String where = "user_id=" + userId + " ORDER BY upload_date DESC";
@@ -435,7 +434,7 @@ public class AdminConn {
         }
     }
 
-    /* ------------------------------ Lifecycle ---------------------------- */
+    /* Lifecycle */
 
     public void close() {
         db.closeConnection();
