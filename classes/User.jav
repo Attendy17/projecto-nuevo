@@ -3,8 +3,7 @@ package ut.JAR.CPEN410;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * User
+/*User
  * 
  * Utility class to handle basic user data,
  * especially to retrieve the profile picture from the images table.
@@ -18,8 +17,7 @@ public class User {
         connector.doConnection();
     }
 
-    /**
-     * Retrieves the URL of the latest profile picture for the given user from the images table.
+    /* Retrieves the URL of the latest profile picture for the given user from the images table.
      * If the user has no picture, returns the default path.
      *
      * @param userId User ID
@@ -44,9 +42,7 @@ public class User {
         return defaultPic;
     }
 
-    /**
-     * Retrieves the user's name from the users table.
-     */
+    /* Retrieves the user's name from the users table. */
     public String getUserName(long userId) {
         try {
             ResultSet rs = connector.doSelect(
@@ -65,9 +61,7 @@ public class User {
         return "";
     }
 
-    /**
-     * Closes the connection.
-     */
+    /* Closes the connection. */
     public void close() {
         connector.closeConnection();
     }
