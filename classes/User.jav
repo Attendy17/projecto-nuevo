@@ -5,9 +5,9 @@ import java.sql.SQLException;
 
 /**
  * User
- * ----
- * Clase utilitaria para manejar datos básicos del usuario,
- * especialmente para obtener la foto de perfil desde la tabla images.
+ * 
+ * Utility class to handle basic user data,
+ * especially to retrieve the profile picture from the images table.
  */
 public class User {
 
@@ -19,16 +19,16 @@ public class User {
     }
 
     /**
-     * Obtiene la URL de la última foto de perfil de un usuario desde la tabla images.
-     * Si no tiene foto, retorna la ruta por defecto.
+     * Retrieves the URL of the latest profile picture for the given user from the images table.
+     * If the user has no picture, returns the default path.
      *
-     * @param userId ID del usuario
-     * @return String con la ruta de la foto
+     * @param userId User ID
+     * @return String with the picture path
      */
     public String getProfilePicture(long userId) {
         String defaultPic = "cpen410/imagesjson/default-profile.png";
         try {
-            // Traer la última foto subida por el usuario
+            // Fetch the latest photo uploaded by the user
             String query = "SELECT image_url FROM images WHERE user_id=" + userId + " ORDER BY upload_date DESC LIMIT 1";
             ResultSet rs = connector.doQuery(query);
             if (rs.next()) {
@@ -45,7 +45,7 @@ public class User {
     }
 
     /**
-     * Obtiene el nombre del usuario desde la tabla users.
+     * Retrieves the user's name from the users table.
      */
     public String getUserName(long userId) {
         try {
@@ -66,7 +66,7 @@ public class User {
     }
 
     /**
-     * Cierra la conexión
+     * Closes the connection.
      */
     public void close() {
         connector.closeConnection();
