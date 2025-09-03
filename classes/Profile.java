@@ -38,10 +38,10 @@ public class Profile {
         db.doConnection();
     }
 
-    /* Helpers 
-     * Escapes single quotes for safe SQL string literals.
-     * Example:  O'Neil -> O''Neil
-     */
+/* Helpers 
+ * Escapes single quotes for safe SQL string literals.
+ * Example:  O'Neil -> O''Neil
+ */
     private String esc(String s) {
         if (s == null) return "";
         StringBuilder sb = new StringBuilder();
@@ -51,16 +51,16 @@ public class Profile {
         return sb.toString();
     }
 
-    /* Read-only Profile 
-     * Returns a single row (if found) with:
-     *   name, email, profile_picture, birth_date, town
-     *
-     * FROM:
-     *   users u LEFT JOIN addresses a ON a.user_id = u.id
-     *
-     * @param userId current session user id (numeric)
-     * @return ResultSet positioned before the first row. Call rs.next().
-     */
+/* Read-only Profile 
+ * Returns a single row (if found) with:
+ *   name, email, profile_picture, birth_date, town
+ *
+ * FROM:
+ *   users u LEFT JOIN addresses a ON a.user_id = u.id
+ *
+ * @param userId current session user id (numeric)
+ * @return ResultSet positioned before the first row. Call rs.next().
+ */
     public ResultSet getOwnProfile(long userId) {
         String fields = "u.name, u.email, u.profile_picture, u.birth_date, a.town";
         String tables = "users u LEFT JOIN addresses a ON a.user_id = u.id";
@@ -68,7 +68,7 @@ public class Profile {
         return db.doSelect(fields, tables, where);
     }
 
-    /* Profile Picture (UPD) 
+/* Profile Picture (UPD) 
      * Updates the user's profile picture path (relative path stored in DB).
      * Example relativePath: cpen410/imagesjson/profile/12345_pic.png
      *
@@ -169,4 +169,5 @@ public class Profile {
         db.closeConnection();
     }
 }
+
 
