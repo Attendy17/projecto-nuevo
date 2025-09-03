@@ -4,8 +4,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 
-/**
- * AdminConn
+/* AdminConn
  * Admin DAO (Statement-based, no PreparedStatement).
  * + Create user and assign role (ADMIN/USER).
  */
@@ -98,8 +97,7 @@ public class AdminConn {
         );
     }
 
-    /**
-     * NEW: Create user (name,email,password hash, birth_date, gender).
+    /* NEW: Create user (name,email,password hash, birth_date, gender).
      * Returns the new userId (>0) or -1 if email is duplicated / error.
      */
     public long createUserBasic(String name, String email, String passwordPlain, String birthDate, String gender) {
@@ -137,8 +135,7 @@ public class AdminConn {
         }
     }
 
-    /**
-     * NEW: Assign a role (ADMIN or USER) to the user.
+    /* NEW: Assign a role (ADMIN or USER) to the user.
      * Creates the role in 'roles' if it does not exist and prevents duplicates in 'user_roles'.
      */
     public boolean assignRoleToUser(long userId, String roleCode) {
@@ -172,8 +169,7 @@ public class AdminConn {
         }
     }
 
-    /**
-     * Update name, email, birth_date, gender.
+    /* Update name, email, birth_date, gender.
      * Checks email uniqueness (allows keeping the same email for the user).
      */
     public boolean updateUserBasic(long userId, String name, String email, String birthDate, String gender) {
@@ -287,7 +283,6 @@ public class AdminConn {
     }
 
     /* Address */
-
     public ResultSet getAddress(long userId) {
         return db.doSelect(
             "street, town, state, country",
@@ -338,7 +333,6 @@ public class AdminConn {
     }
 
     /* Education */
-
     public ResultSet listEducation(long userId) {
         String where = "user_id=" + userId + " ORDER BY id DESC";
         return db.doSelect(
@@ -407,7 +401,6 @@ public class AdminConn {
     }
 
     /* Photos */
-
     public ResultSet getUserPhotos(long userId) {
         String where = "user_id=" + userId + " ORDER BY upload_date DESC";
         return db.doSelect(
@@ -435,7 +428,6 @@ public class AdminConn {
     }
 
     /* Lifecycle */
-
     public void close() {
         db.closeConnection();
     }
@@ -444,4 +436,5 @@ public class AdminConn {
         return db;
     }
 }
+
 
