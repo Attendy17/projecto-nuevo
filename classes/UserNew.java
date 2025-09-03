@@ -6,17 +6,17 @@ import java.sql.Statement;
 
 /**
  * UserNew
- * ---------------------------------------------------------------------------
- * DAO para registrar un nuevo usuario y datos relacionados:
- *   - createUser(name, email, passPlain, birthDate, gender) -> devuelve userId
- *   - ensureUserRole(userId) -> asegura rol USER y lo asigna al usuario
+ *
+ * DAO to register a new user and related data:
+ *   - createUser(name, email, passPlain, birthDate, gender) -> returns userId
+ *   - ensureUserRole(userId) -> ensures USER role exists and assigns it
  *   - upsertAddress(userId, street, town, state, country)
  *   - addEducation(userId, degree, school)
  *
- * Restricciones:
- *   - Solo Statement (sin PreparedStatement) via MySQLCompleteConnector.
- *   - Hash de password en MySQL: SHA2('<plain>', 256).
- *   - SQL encapsulado, no en los JSPs.
+ * Constraints:
+ *   - Statement-only (no PreparedStatement) via MySQLCompleteConnector.
+ *   - Password hash in MySQL: SHA2('<plain>', 256).
+ *   - SQL is encapsulated here, not in JSPs.
  */
 public class UserNew {
 
@@ -27,6 +27,7 @@ public class UserNew {
         db.doConnection();
     }
 
+    /* Escapes single quotes for SQL string literals. */
     private String esc(String s) {
         if (s == null) return "";
         StringBuilder sb = new StringBuilder();
@@ -36,7 +37,7 @@ public class UserNew {
         return sb.toString();
     }
 
-    /** Crea al usuario. Devuelve su id (>0) o -1 si falla/duplicado. */
+    /* Creates the user. Returns its id (>0) or -1 on failure/duplicate. */
     public long createUser(String name, String email, String passPlain, String birthDate, String gender) {
         String nm = esc(name);
         String em = esc(email);
@@ -51,16 +52,16 @@ public class UserNew {
             Connection c = db.getConnection();
             s = c.createStatement();
 
-            // Unicidad de email
+            // Email uniqueness
             rs = s.executeQuery("SELECT COUNT(*) FROM users WHERE email='" + em + "'");
             long cnt = 0;
             if (rs != null && rs.next()) cnt = rs.getLong(1);
             if (rs != null) { rs.close(); rs = null; }
             if (cnt > 0) {
-                return -1; // email duplicado
+                return -1; // duplicated email
             }
 
-            // INSERT con hash
+            // INSERT with hash
             int rows = s.executeUpdate(
                 "INSERT INTO users(name,email,password,birth_date,gender,profile_picture,last_page_id) VALUES (" +
                 "'" + nm + "'," +
@@ -74,7 +75,7 @@ public class UserNew {
             );
             if (rows <= 0) return -1;
 
-            // Obtener id por email
+            // Get id by email
             rs = s.executeQuery("SELECT id FROM users WHERE email='" + em + "' LIMIT 1");
             if (rs != null && rs.next()) {
                 long newId = rs.getLong(1);
@@ -91,7 +92,7 @@ public class UserNew {
         }
     }
 
-    /** Asegura que rol USER exista y asigna el rol al usuario (si no lo tiene). */
+    /* Ensures USER role exists and assigns the role to the user (if not already assigned). */
     public void ensureUserRole(long userId) {
         Statement s = null;
         ResultSet rs = null;
@@ -99,7 +100,7 @@ public class UserNew {
             Connection c = db.getConnection();
             s = c.createStatement();
 
-            // Asegura rol USER
+            // Ensure USER role
             rs = s.executeQuery("SELECT id FROM roles WHERE code='USER' LIMIT 1");
             long ridUser = -1;
             if (rs != null && rs.next()) {
@@ -113,7 +114,7 @@ public class UserNew {
             }
             if (ridUser <= 0) return;
 
-            // Asignar si no lo tiene
+            // Assign if user does not have it yet
             rs = s.executeQuery("SELECT COUNT(*) FROM user_roles WHERE user_id=" + userId + " AND role_id=" + ridUser);
             long cnt=0;
             if (rs != null && rs.next()) cnt = rs.getLong(1);
@@ -132,7 +133,7 @@ public class UserNew {
         }
     }
 
-    /** Upsert en addresses (1:1). */
+    /* Upsert into addresses (1:1). */
     public boolean upsertAddress(long userId, String street, String town, String state, String country) {
         String st = esc(street);
         String tw = esc(town);
@@ -173,7 +174,7 @@ public class UserNew {
         }
     }
 
-    /** Insert en education (1:N). */
+    /* Insert into education (1:N). */
     public boolean addEducation(long userId, String degree, String school) {
         String dg = esc(degree==null?"":degree);
         String sc = esc(school==null?"":school);
