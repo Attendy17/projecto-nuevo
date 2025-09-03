@@ -69,13 +69,13 @@ public class Profile {
     }
 
 /* Profile Picture (UPD) 
-     * Updates the user's profile picture path (relative path stored in DB).
-     * Example relativePath: cpen410/imagesjson/profile/12345_pic.png
-     *
-     * @param userId       the owner user id
-     * @param relativePath a web-relative path to serve via Tomcat
-     * @return true if one or more rows were updated; false otherwise
-     */
+ * Updates the user's profile picture path (relative path stored in DB).
+ * Example relativePath: cpen410/imagesjson/profile/12345_pic.png
+ *
+ * @param userId       the owner user id
+ * @param relativePath a web-relative path to serve via Tomcat
+ * @return true if one or more rows were updated; false otherwise
+ */
     public boolean updateProfilePicture(long userId, String relativePath) {
         String rel = esc(relativePath);
         Statement s = null;
@@ -94,17 +94,17 @@ public class Profile {
         }
     }
 
-    /* Photo Posts (INS)
-     * Adds a new user photo post.
-     *
-     * Writes into the 'images' table (per your schema). The upload_date
-     * is filled by MySQL (DEFAULT CURRENT_TIMESTAMP).
-     *
-     * @param userId     owner user id
-     * @param imagePath  relative path to the stored image
-     *                   e.g., "cpen410/imagesjson/userpost/123_...jpg"
-     * @return true if the photo row was inserted; false otherwise
-     */
+/* Photo Posts (INS)
+ * Adds a new user photo post.
+ *
+ * Writes into the 'images' table (per your schema). The upload_date
+ * is filled by MySQL (DEFAULT CURRENT_TIMESTAMP).
+ *
+ * @param userId     owner user id
+ * @param imagePath  relative path to the stored image
+ *                   e.g., "cpen410/imagesjson/userpost/123_...jpg"
+ * @return true if the photo row was inserted; false otherwise
+ */
     public boolean addUserPost(long userId, String imagePath) {
         String img = esc(imagePath);
         Statement s = null;
@@ -124,27 +124,27 @@ public class Profile {
         }
     }
 
-    /* Photo Posts (SEL)
-     * Lists the current user's photo posts, newest first.
-     * Returns columns:
-     *   id, image_url, upload_date
-     *
-     * @param userId owner user id
-     * @return ResultSet of rows (call rs.next())
-     */
+/* Photo Posts (SEL)
+ * Lists the current user's photo posts, newest first.
+ * Returns columns:
+ *   id, image_url, upload_date
+ *
+ * @param userId owner user id
+ * @return ResultSet of rows (call rs.next())
+ */
     public ResultSet getUserPhotos(long userId) {
         String fields = "id, image_url, upload_date";
         String where  = "user_id=" + userId + " ORDER BY upload_date DESC";
         return db.doSelect(fields, "images", where);
     }
 
-    /* Delete Post
-     * Deletes one photo by id ensuring ownership (user_id match).
-     *
-     * @param userId owner user id (must match row owner)
-     * @param photoId images.id primary key
-     * @return true if a row was deleted; false otherwise
-     */
+/* Delete Post
+ * Deletes one photo by id ensuring ownership (user_id match).
+ *
+ * @param userId owner user id (must match row owner)
+ * @param photoId images.id primary key
+ * @return true if a row was deleted; false otherwise
+ */
     public boolean deleteUserPost(long userId, long photoId) {
         Statement s = null;
         try {
@@ -162,12 +162,13 @@ public class Profile {
         }
     }
 
-    /* Lifecycle 
-     *Close the underlying connection (call this when you're done). 
-     */
+/* Lifecycle 
+ *Close the underlying connection (call this when you're done). 
+ */
     public void close() {
         db.closeConnection();
     }
 }
+
 
 
