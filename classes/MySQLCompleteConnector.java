@@ -2,8 +2,7 @@ package ut.JAR.CPEN410;
 
 import java.sql.*;
 
-/**
- * MySQLCompleteConnector is a utility class for managing a connection to a MySQL database.
+/* MySQLCompleteConnector is a utility class for managing a connection to a MySQL database.
  * It provides methods for establishing a connection, executing SELECT and INSERT queries,
  * and closing the connection.
  *
@@ -29,16 +28,14 @@ public class MySQLCompleteConnector {
     private Connection conn;
     private Statement stmt;
 
-    /**
-     * Constructor initializes the connection and statement objects to null.
+    /* Constructor initializes the connection and statement objects to null.
      */
     public MySQLCompleteConnector() {
         conn = null;
         stmt = null;
     }
 
-    /**
-     * Establishes a connection to the MySQL database.
+    /* Establishes a connection to the MySQL database.
      *
      * <p>This method registers the JDBC driver, connects to the database using the specified
      * DB_URL, USER, and PASS, and creates a Statement object for executing queries.</p>
@@ -66,8 +63,7 @@ public class MySQLCompleteConnector {
         }
     }
 
-    /**
-     * Returns the current Connection object.
+    /* Returns the current Connection object.
      *
      * @return the Connection object used by this connector.
      */
@@ -75,8 +71,7 @@ public class MySQLCompleteConnector {
         return conn;
     }
 
-    /**
-     * Returns the current Statement object.
+    /* Returns the current Statement object.
      * (Some of your classes need this, e.g., setLastPage()).
      *
      * @return the Statement object used by this connector.
@@ -85,8 +80,7 @@ public class MySQLCompleteConnector {
         return stmt;
     }
 
-    /**
-     * Closes the Statement and Connection objects to free up resources.
+    /* Closes the Statement and Connection objects to free up resources.
      */
     public void closeConnection() {
         try {
@@ -105,8 +99,7 @@ public class MySQLCompleteConnector {
         conn  = null;
     }
 
-    /**
-     * Executes a SELECT query with a WHERE clause.
+    /* Executes a SELECT query with a WHERE clause.
      *
      * @param fields the fields to select.
      * @param tables the table(s) from which to select.
@@ -129,8 +122,7 @@ public class MySQLCompleteConnector {
         return result;
     }
 
-    /**
-     * Executes a SELECT query without a WHERE clause.
+    /* Executes a SELECT query without a WHERE clause.
      *
      * @param fields the fields to select.
      * @param tables the table(s) from which to select.
@@ -152,8 +144,7 @@ public class MySQLCompleteConnector {
         return result;
     }
 
-    /**
-     * Executes an INSERT query without specifying column names.
+    /* Executes an INSERT query without specifying column names.
      *
      * <p>This method is less recommended because it relies on the table structure.</p>
      *
@@ -180,8 +171,7 @@ public class MySQLCompleteConnector {
         return res;
     }
 
-    /**
-     * Executes an INSERT query by specifying column names and using executeUpdate().
+    /* Executes an INSERT query by specifying column names and using executeUpdate().
      *
      * <p>This method is recommended as it explicitly states the columns being inserted.</p>
      *
@@ -208,3 +198,4 @@ public class MySQLCompleteConnector {
         return res;
     }
 }
+
