@@ -4,8 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-/**
- * SearchFriend
+/* SearchFriend
  *
  * Single search-bar friend search:
  *   Matches by name / email / town / state / country (LIKE %keyword%)
@@ -34,8 +33,7 @@ public class SearchFriend {
         return sb.toString();
     }
 
-    /**
-     * Executes a single-keyword search. The WHERE clause groups OR conditions to
+    /* Executes a single-keyword search. The WHERE clause groups OR conditions to
      * ensure correct precedence across fields and optional gender/age matches.
      *
      * Columns returned:
