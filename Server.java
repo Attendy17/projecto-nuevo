@@ -1,6 +1,6 @@
 /**
  * Louiz A. Inostroza Ruiz s01397648
- * Anais Ortiz Montanez
+ * Anais Ortiz Montanez    s01433872
  * Idaliedes Vergara
  * Project 2
  *
@@ -56,22 +56,22 @@ public class Server {
 
     // ===== API methods used by ClientHandler =====
 
-    /** (1) Add a new genre */
+    /* Add a new genre */
     public synchronized boolean createGenre(String genreName) {
         return tree.insertGenre(genreName);
     }
 
-    /** (4) List all genres (in-order) */
+    /* List all genres (in-order) */
     public synchronized String[] getAllGenres() {
         return tree.listGenres();
     }
 
-    /** (2) Add a new book */
+    /* Add a new book */
     public synchronized boolean createBook(String genre, String title, String plot, int year, AuthorList authors) {
         return tree.addBook(genre, title, plot, year, authors);
     }
 
-    /** (3) Update book info */
+    /* Update book  */
     public synchronized boolean updateBook(
             String oldTitle,
             String newTitle,
@@ -87,17 +87,17 @@ public class Server {
         return genreNode.books.insertBook(newTitle, newPlot, newYear, authors);
     }
 
-    /** (5) List all books across all genres */
+    /* List all books across all genres */
     public synchronized String[] getAllBooks() {
         return tree.listAllBooks();
     }
 
-    /** (6) List all books of one genre */
+    /* List all books of one genre */
     public synchronized String[] getBooksByGenre(String genre) {
         return tree.listBooksByGenre(genre);
     }
 
-    /** (7) Search a book by title */
+    /* Search a book by title */
     public synchronized String[] getBookByTitle(String title) {
         return tree.getBookInfo(title);
     }
@@ -199,4 +199,5 @@ public class Server {
         }
         tree.addBook(genre, title, plot, year, authorList);
     }
+
 }
