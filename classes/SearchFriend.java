@@ -6,7 +6,7 @@ import java.sql.Statement;
 
 /**
  * SearchFriend
- * ---------------------------------------------------------------------------
+ *
  * Single search-bar friend search:
  *   Matches by name / email / town / state / country (LIKE %keyword%)
  *   If keyword is "male"/"female"/"other" (any case), matches gender exactly
@@ -26,7 +26,7 @@ public class SearchFriend {
         dbConn.doConnection();
     }
 
-    /** Escape single quotes without using replace(), matching your style. */
+    /* Escape single quotes without using replace(), matching your style. */
     private String esc(String s) {
         if (s == null) return "";
         StringBuilder sb = new StringBuilder();
@@ -97,7 +97,7 @@ public class SearchFriend {
         }
     }
 
-    /** Closes the underlying connector (which closes connection & statement). */
+    /* Closes the underlying connector (which closes connection & statement). */
     public void close() {
         dbConn.closeConnection();
     }
