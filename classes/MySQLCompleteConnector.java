@@ -11,8 +11,8 @@ import java.sql.*;
  */
 public class MySQLCompleteConnector {
 
-    // Database URL (schema 'cpen410p1') con parámetros para evitar "Public Key Retrieval is not allowed"
-    // Ajusta host/puerto si aplica.
+    // Database URL (schema 'cpen410p1') with parameters to avoid "Public Key Retrieval is not allowed".
+    // Adjust host/port if needed.
     private String DB_URL =
         "jdbc:mysql://localhost:3306/cpen410p1"
       + "?useUnicode=true"
@@ -21,7 +21,7 @@ public class MySQLCompleteConnector {
       + "&allowPublicKeyRetrieval=true"
       + "&useSSL=false";
 
-    // Credenciales (ajusta según tu entorno)
+    // Credentials (adjust to your environment)
     private String USER = "root";
     private String PASS = "1234";
 
@@ -45,11 +45,11 @@ public class MySQLCompleteConnector {
      */
     public void doConnection() {
         try {
-            // Cargar driver (primero Connector/J 8, fallback a legacy si está disponible)
+            // Load driver (prefer Connector/J 8; fallback to legacy if available)
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
             } catch (ClassNotFoundException e) {
-                // Compatibilidad con jars antiguos
+                // Compatibility with older jars
                 Class.forName("com.mysql.jdbc.Driver");
             }
 
@@ -59,7 +59,7 @@ public class MySQLCompleteConnector {
             stmt = conn.createStatement();
             System.out.println("Statement OK...");
         } catch(Exception e) {
-            // Deja traza y asegura objetos en null
+            // Log stack trace and ensure objects are null
             e.printStackTrace();
             conn = null;
             stmt = null;
@@ -77,7 +77,7 @@ public class MySQLCompleteConnector {
 
     /**
      * Returns the current Statement object.
-     * (Algunas clases tuyas lo necesitan, p.ej. setLastPage()).
+     * (Some of your classes need this, e.g., setLastPage()).
      *
      * @return the Statement object used by this connector.
      */
@@ -157,9 +157,9 @@ public class MySQLCompleteConnector {
      *
      * <p>This method is less recommended because it relies on the table structure.</p>
      *
-     * @param table  the table into which data will be inserted. (Puedes pasar "tabla(col1,col2,...)")
+     * @param table  the table into which data will be inserted. (You may pass "table(col1,col2,...)")
      * @param values the values to insert.
-     * @return true if the insertion executed successfully (execute() retornó sin excepción), false otherwise.
+     * @return true if the insertion executed successfully (execute() returned without exception), false otherwise.
      */
     public boolean doInsert(String table, String values) {
         boolean res = false;
@@ -167,8 +167,8 @@ public class MySQLCompleteConnector {
         System.out.println(insertionStatement);
         try {
             if (stmt != null) {
-                // Nota: execute() devuelve true si hay ResultSet; para INSERT suele devolver false.
-                // Tu lógica superior revalida con un SELECT posterior, así que mantenemos este comportamiento.
+                // Note: execute() returns true if there is a ResultSet; for INSERT it usually returns false.
+                // Your higher-level logic re-validates with a subsequent SELECT, so we keep this behavior.
                 res = stmt.execute(insertionStatement);
                 System.out.println("Insertion executed (execute() returned): " + res);
             } else {
