@@ -5,8 +5,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
 
-/**
- * Profile
+/* Profile
  *
  * DAO to manage the signed-in user's profile and photo posts.
  *   - Read own profile (users + addresses)
@@ -169,6 +168,7 @@ public class Profile {
         db.closeConnection();
     }
 }
+
 
 
 
