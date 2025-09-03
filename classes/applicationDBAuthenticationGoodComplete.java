@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 /**
  * applicationDBAuthenticationGoodComplete
- * ---------------------------------------------------------------------------
+ *
  * Single entry-point (facade) for:
  *   User authentication with password hashing (MySQL SHA2(...,256))
  *   Role lookup (returns role CODE: "ADMIN" or "USER")
@@ -32,9 +32,7 @@ public class applicationDBAuthenticationGoodComplete {
         myDBConn.doConnection();
     }
 
-    /* ________________________________ Helpers ________________________________ */
-
-    /**
+    /* Helpers
      * Escapes single quotes to make a safe SQL string literal
      * without using String.replace() (to match your coding constraints).
      * Example:  O'Neil  ->  O''Neil
@@ -51,9 +49,7 @@ public class applicationDBAuthenticationGoodComplete {
         return sb.toString();
     }
 
-    /* _____________________________ Authentication ____________________________ */
-
-    /**
+    /* Authentication 
      * Authenticates a user by email and password.
      * The comparison is done in MySQL using SHA2(<plain>, 256).
      *
@@ -71,9 +67,7 @@ public class applicationDBAuthenticationGoodComplete {
         return myDBConn.doSelect(fields, table, where);
     }
 
-    /* _______________________________ Role Lookup _____________________________ */
-
-    /**
+    /* Role Lookup 
      * Returns the user's role CODE (e.g., "ADMIN", "USER") as stored in roles.code.
      * IMPORTANT: This method uses roles.code, not roles.name.
      *
@@ -98,9 +92,7 @@ public class applicationDBAuthenticationGoodComplete {
         return roleCode == null ? "" : roleCode;
     }
 
-    /* __________________________________ Sign-up ______________________________ */
-
-    /**
+    /* Sign-up 
      * Inserts a new user and ensures the USER role is assigned.
      * Expects birthDate as 'YYYY-MM-DD' and gender  {'Male','Female','Other'}.
      *
@@ -122,7 +114,7 @@ public class applicationDBAuthenticationGoodComplete {
         String bd = escapeQuotes(birthDate);
         String gd = escapeQuotes(gender);
 
-        // (1) Insert the user with SHA2 hash
+        // Insert the user with SHA2 hash
         String tableCols = "users(name,email,password,birth_date,gender,profile_picture,last_page_id)";
         String values    = "'" + nm + "', '" + em + "', SHA2('" + pw + "',256), '" + bd + "', '" + gd + "', NULL, NULL";
         boolean executed = myDBConn.doInsert(tableCols, values);
@@ -135,7 +127,7 @@ public class applicationDBAuthenticationGoodComplete {
             return false;
         }
 
-        // (2) Ensure USER role exists and link it to this user
+        // Ensure USER role exists and link it to this user
         long roleUserId = getRoleIdByCode("USER");
         if (roleUserId <= 0) {
             // Create USER role if absent
@@ -160,8 +152,7 @@ public class applicationDBAuthenticationGoodComplete {
         return true;
     }
 
-    /**
-     * Helper: returns user id by email, or -1 if not found.
+    /* Helper: returns user id by email, or -1 if not found.
      *
      * @param email user email
      * @return database id or -1
@@ -178,8 +169,7 @@ public class applicationDBAuthenticationGoodComplete {
         return -1;
     }
 
-    /**
-     * Helper: returns role id by role code (e.g., "USER"), or -1 if not found.
+    /* Helper: returns role id by role code (e.g., "USER"), or -1 if not found.
      *
      * @param code role code string
      * @return role id or -1
@@ -196,9 +186,7 @@ public class applicationDBAuthenticationGoodComplete {
         return -1;
     }
 
-    /* ________________________ Page Access & Last Page ________________________ */
-
-    /**
+    /* Page Access & Last Page 
      * Checks whether the given user can access the provided pageURL.
      * The rule is enforced through rolewebpagegood (role-page mapping) and webPageGood.
      *
@@ -223,8 +211,7 @@ public class applicationDBAuthenticationGoodComplete {
         return c > 0;
     }
 
-    /**
-     * Updates users.last_page_id to the id of the provided pageURL (if found).
+    /* Updates users.last_page_id to the id of the provided pageURL (if found).
      * If no page record exists for the given URL, no action is taken.
      *
      * @param userId  database id of the user
@@ -233,7 +220,7 @@ public class applicationDBAuthenticationGoodComplete {
     public void setLastPage(long userId, String pageURL) {
         String url = escapeQuotes(pageURL);
 
-        // (1) Resolve page id by URL
+        // Resolve page id by URL
         ResultSet rs = myDBConn.doSelect("id", "webPageGood", "pageURL='" + url + "'");
         long pid = -1;
         try {
@@ -241,7 +228,7 @@ public class applicationDBAuthenticationGoodComplete {
             if (rs != null) rs.close();
         } catch (SQLException e) { e.printStackTrace(); }
 
-        // (2) Update users.last_page_id if a valid page id exists
+        // Update users.last_page_id if a valid page id exists
         if (pid > 0) {
             try {
                 // Direct UPDATE via the underlying Statement (your connector exposes it)
@@ -254,9 +241,7 @@ public class applicationDBAuthenticationGoodComplete {
         }
     }
 
-    /* ____________________________________ Misc __________________________________ */
-
-    /**
+    /* Misc 
      * Returns auxiliary user data (currently last_page_id) for the given email.
      *
      * @param email user email
@@ -267,8 +252,7 @@ public class applicationDBAuthenticationGoodComplete {
         return myDBConn.doSelect("last_page_id", "users", "email='" + em + "'");
     }
 
-    /**
-     * Closes the underlying Statement and Connection.
+    /* Closes the underlying Statement and Connection.
      * Call this at the end of each JSP/Servlet using this facade.
      */
     public void close() {
