@@ -18,9 +18,9 @@ public class AdminConn {
         db.doConnection();
     }
 
-    /* Helpers */
-
-    /* Escape single quotes for SQL literals. */
+    /* Helpers
+     * Escape single quotes for SQL literals. 
+     */
     private String esc(String s) {
         if (s == null) return "";
         StringBuilder sb = new StringBuilder(s.length() + 8);
@@ -30,9 +30,9 @@ public class AdminConn {
         return sb.toString();
     }
 
-    /* ===== NEW: user/role helpers ===== */
-
-    /* Returns user id by email, or -1 if it does not exist. */
+    /* NEW: user/role helpers 
+     * Returns user id by email, or -1 if it does not exist. 
+     */
     private long getUserIdByEmail(String email) {
         ResultSet rs = null;
         try {
@@ -78,9 +78,9 @@ public class AdminConn {
         return getRoleIdByCode(code);
     }
 
-    /* Users */
-
-    /* Simple user list for dashboard. */
+    /* Users 
+     * Simple user list for dashboard. 
+     */
     public ResultSet listUsers() {
         return db.doSelect(
             "id, name, email, birth_date, gender, profile_picture",
@@ -444,3 +444,4 @@ public class AdminConn {
         return db;
     }
 }
+
