@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 /**
  * Profile
- * ---------------------------------------------------------------------------
+ *
  * DAO to manage the signed-in user's profile and photo posts.
  *   - Read own profile (users + addresses)
  *   - Update profile picture (users.profile_picture)
@@ -38,9 +38,7 @@ public class Profile {
         db.doConnection();
     }
 
-    /* ------------------------------- Helpers ------------------------------- */
-
-    /**
+    /* Helpers 
      * Escapes single quotes for safe SQL string literals.
      * Example:  O'Neil -> O''Neil
      */
@@ -53,9 +51,7 @@ public class Profile {
         return sb.toString();
     }
 
-    /* -------------------------- Read-only Profile -------------------------- */
-
-    /**
+    /* Read-only Profile 
      * Returns a single row (if found) with:
      *   name, email, profile_picture, birth_date, town
      *
@@ -72,9 +68,7 @@ public class Profile {
         return db.doSelect(fields, tables, where);
     }
 
-    /* ------------------------- Profile Picture (UPD) ------------------------ */
-
-    /**
+    /* Profile Picture (UPD) 
      * Updates the user's profile picture path (relative path stored in DB).
      * Example relativePath: cpen410/imagesjson/profile/12345_pic.png
      *
@@ -100,9 +94,7 @@ public class Profile {
         }
     }
 
-    /* --------------------------- Photo Posts (INS) -------------------------- */
-
-    /**
+    /* Photo Posts (INS)
      * Adds a new user photo post.
      *
      * Writes into the 'images' table (per your schema). The upload_date
@@ -132,9 +124,7 @@ public class Profile {
         }
     }
 
-    /* ---------------------------- Photo Posts (SEL) ------------------------- */
-
-    /**
+    /* Photo Posts (SEL)
      * Lists the current user's photo posts, newest first.
      * Returns columns:
      *   id, image_url, upload_date
@@ -148,9 +138,7 @@ public class Profile {
         return db.doSelect(fields, "images", where);
     }
 
-    /* ------------------------ [Optional] Delete Post ------------------------ */
-
-    /**
+    /* Delete Post
      * Deletes one photo by id ensuring ownership (user_id match).
      *
      * @param userId owner user id (must match row owner)
@@ -174,10 +162,11 @@ public class Profile {
         }
     }
 
-    /* ------------------------------- Lifecycle ------------------------------ */
-
-    /** Close the underlying connection (call this when you're done). */
+    /* Lifecycle 
+     *Close the underlying connection (call this when you're done). 
+     */
     public void close() {
         db.closeConnection();
     }
 }
+
