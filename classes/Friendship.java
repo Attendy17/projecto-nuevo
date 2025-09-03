@@ -6,17 +6,17 @@ import java.sql.SQLException;
 /**
  * Friendship
  * ---------------------------------------------------------------------------
- * DAO de amistades usando el esquema real:
- *   friendships(user_low, user_high, created_at)  con user_low < user_high
- *   y la vista friendship_list(owner_id, friend_id, created_at)
+ * Friendships DAO using the real schema:
+ *   friendships(user_low, user_high, created_at) with user_low < user_high
+ *   and the view friendship_list(owner_id, friend_id, created_at)
  *
- * Funciones:
- *   • addFriend(meId, friendId): inserta arista (min,max), idempotente
- *   • listFriends(meId): lista amigos del usuario vía la vista friendship_list
+ * Functions:
+ *   • addFriend(meId, friendId): inserts edge (min,max), idempotent
+ *   • listFriends(meId): lists user's friends via the friendship_list view
  *
- * Reglas:
- *   • Solo Statement, usando MySQLCompleteConnector
- *   • Sin SQL en JSP
+ * Rules:
+ *   • Statement-only, using MySQLCompleteConnector
+ *   • No SQL in JSP
  */
 public class Friendship {
 
@@ -27,7 +27,7 @@ public class Friendship {
         db.doConnection();
     }
 
-    /** Devuelve true si ya existe amistad entre a y b (sin importar orden). */
+    /** Returns true if a and b are already friends (order-independent). */
     public boolean isFriends(long a, long b) {
         long u1 = Math.min(a, b);
         long u2 = Math.max(a, b);
@@ -49,29 +49,29 @@ public class Friendship {
     }
 
     /**
-     * Agrega amistad (idempotente). Si ya existe, devuelve true.
-     * La tabla tiene CHECK(user_low < user_high), por eso forzamos orden.
+     * Adds a friendship (idempotent). If it already exists, returns true.
+     * Table enforces CHECK(user_low < user_high), hence the enforced order.
      */
     public boolean addFriend(long meId, long friendId) {
-        if (meId == friendId) return false; // No te puedes agregar a ti mismo
+        if (meId == friendId) return false; // cannot add yourself
 
         long u1 = Math.min(meId, friendId);
         long u2 = Math.max(meId, friendId);
 
         if (isFriends(meId, friendId)) return true;
 
-        // Insertar arista (min,max)
+        // Insert edge (min,max)
         db.doInsert(
             "friendships(user_low, user_high, created_at)",
             u1 + "," + u2 + ", CURRENT_TIMESTAMP"
         );
-        // Confirmar
+        // Confirm
         return isFriends(meId, friendId);
     }
 
-     /**
-     * Retorna las ltimas 'max' fotos publicadas por los amigos de 'ownerId'.
-     * Columnas: image_url, upload_date, user_id, name
+    /**
+     * Returns the latest 'max' photos posted by 'ownerId' friends.
+     * Columns: image_url, upload_date, user_id, name
      */
     public ResultSet getFriendsPhotos(long ownerId, int max) {
         if (max <= 0) max = 30;
@@ -82,8 +82,8 @@ public class Friendship {
             "friendship_list fl " +
             "JOIN images i ON i.user_id = fl.friend_id " +
             "JOIN users  u ON u.id = fl.friend_id";
-        // Como tu conector arma: SELECT fields FROM tables WHERE <where>;
-        // agregamos ORDER BY y LIMIT al final del "where".
+        // The connector builds: SELECT fields FROM tables WHERE <where>;
+        // add ORDER BY and LIMIT at the end of the "where".
         String where =
             "fl.owner_id=" + ownerId + " " +
             "ORDER BY i.upload_date DESC " +
@@ -91,9 +91,10 @@ public class Friendship {
 
         return db.doSelect(fields, tables, where);
     }
+
     /**
-     * Lista los amigos del usuario meId usando la vista friendship_list.
-     * Devuelve: u.id, u.name, u.email, u.profile_picture, u.gender, age
+     * Lists user friends (meId) using the friendship_list view.
+     * Returns: u.id, u.name, u.email, u.profile_picture, u.gender, age
      */
     public ResultSet listFriends(long meId) {
         String fields =
@@ -107,6 +108,7 @@ public class Friendship {
         return db.doSelect(fields, tables, where);
     }
 
+    /** Closes underlying DB connection. */
     public void close() {
         db.closeConnection();
     }
