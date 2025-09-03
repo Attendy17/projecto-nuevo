@@ -3,8 +3,7 @@ package ut.JAR.CPEN410;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * applicationDBAuthenticationGoodComplete
+/* applicationDBAuthenticationGoodComplete
  *
  * Single entry-point (facade) for:
  *   User authentication with password hashing (MySQL SHA2(...,256))
@@ -19,10 +18,10 @@ import java.sql.SQLException;
  */
 public class applicationDBAuthenticationGoodComplete {
 
-    /** Shared DB connector (kept open for this facade lifetime). */
+    /* Shared DB connector (kept open for this facade lifetime). */
     private final MySQLCompleteConnector myDBConn;
 
-    /**
+    /*
      * Constructor.
      * Opens the database connection and prepares an internal Statement.
      */
