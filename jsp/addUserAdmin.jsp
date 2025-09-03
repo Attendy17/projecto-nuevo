@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <title>Add New User - Admin Panel</title>
+    <!-- Viewport para responsive correcto -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
       * {
         margin: 0;
@@ -106,6 +108,10 @@
         cursor: pointer;
       }
 
+      /* ====== Grid base: mobile-first por columnas ====== */
+      .row::after { content: ""; display: table; clear: both; }
+      [class*="col-"] { float: left; width: 100%; padding: 0 10px; }
+
       /* Tablet layout - 600px columns */
       @media only screen and (min-width: 600px) {
         .nav-bar {
@@ -180,72 +186,106 @@
       <form action="addUserAdminResult.jsp" method="post">
         <div class="section">
           <h2>Basic Information</h2>
-          <div class="form-group">
-            <label for="name">Full Name:</label>
-            <input type="text" id="name" name="name" required />
-          </div>
-          <div class="form-group">
-            <label for="email">Email (Username):</label>
-            <input type="email" id="email" name="email" required />
-          </div>
-          <div class="form-group">
-            <label for="userPass">Password:</label>
-            <input type="password" id="userPass" name="userPass" required />
-          </div>
-          <div class="form-group">
-            <label for="birthDate">Birth Date:</label>
-            <input type="date" id="birthDate" name="birthDate" required />
-          </div>
-          <div class="form-group">
-            <label for="gender">Gender:</label>
-            <select id="gender" name="gender" required>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="isAdmin">Administrator?</label>
-            <input type="checkbox" id="isAdmin" name="isAdmin" value="true" />
+
+          <!-- Grid de 2 columnas en ≥600/768px; 1 columna en móvil -->
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="email">Email (Username):</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="form-group">
+                <label for="userPass">Password:</label>
+                <input type="password" id="userPass" name="userPass" required />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="birthDate">Birth Date:</label>
+                <input type="date" id="birthDate" name="birthDate" required />
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="isAdmin">Administrator?</label>
+                <input type="checkbox" id="isAdmin" name="isAdmin" value="true" />
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="section">
           <h2>Address</h2>
-          <div class="form-group">
-            <label for="street">Street:</label>
-            <input type="text" id="street" name="street" required />
-          </div>
-          <div class="form-group">
-            <label for="town">Town:</label>
-            <input type="text" id="town" name="town" required />
-          </div>
-          <div class="form-group">
-            <label for="state">State:</label>
-            <input type="text" id="state" name="state" required />
-          </div>
-          <div class="form-group">
-            <label for="country">Country:</label>
-            <input type="text" id="country" name="country" required />
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="street">Street:</label>
+                <input type="text" id="street" name="street" required />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="town">Town:</label>
+                <input type="text" id="town" name="town" required />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state" required />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="country">Country:</label>
+                <input type="text" id="country" name="country" required />
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="section">
           <h2>Education</h2>
-          <div class="form-group">
-            <label for="degree">Degree:</label>
-            <select id="degree" name="degree" required>
-              <option value="">Select a degree</option>
-              <option value="High School Degree">High School Degree</option>
-              <option value="Bachelor's Degree">Bachelor's Degree</option>
-              <option value="Master's Degree">Master's Degree</option>
-              <option value="Doctorate Degree">Doctorate Degree</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="school">School:</label>
-            <input type="text" id="school" name="school" required />
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="degree">Degree:</label>
+                <select id="degree" name="degree" required>
+                  <option value="">Select a degree</option>
+                  <option value="High School Degree">High School Degree</option>
+                  <option value="Bachelor's Degree">Bachelor's Degree</option>
+                  <option value="Master's Degree">Master's Degree</option>
+                  <option value="Doctorate Degree">Doctorate Degree</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="school">School:</label>
+                <input type="text" id="school" name="school" required />
+              </div>
+            </div>
           </div>
         </div>
 
