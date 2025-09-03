@@ -5,7 +5,6 @@ import java.sql.SQLException;
 
 /**
  * Friendship
- * ---------------------------------------------------------------------------
  * Friendships DAO using the real schema:
  *   friendships(user_low, user_high, created_at) with user_low < user_high
  *   and the view friendship_list(owner_id, friend_id, created_at)
@@ -113,3 +112,4 @@ public class Friendship {
         db.closeConnection();
     }
 }
+
