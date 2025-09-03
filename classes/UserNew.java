@@ -4,8 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-/**
- * UserNew
+/* UserNew
  *
  * DAO to register a new user and related data:
  *   - createUser(name, email, passPlain, birthDate, gender) -> returns userId
@@ -200,3 +199,4 @@ public class UserNew {
         db.closeConnection();
     }
 }
+
