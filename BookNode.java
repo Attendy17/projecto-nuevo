@@ -1,6 +1,6 @@
 /**
  * Louiz A. Inostroza Ruiz s01397648
- * Anais Ortiz Montanez
+ * Anais Ortiz Montanez    s01433872
  * Idaliedes Vergara
  * Project 2
  * 
@@ -33,3 +33,4 @@ public class BookNode {
      this.next = this;
  }
 }
+
